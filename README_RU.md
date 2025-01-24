@@ -28,7 +28,7 @@
   [![Closed issues](https://img.shields.io/github/issues-closed/Gourieff/ComfyUI-ReActor?color=green&cacheSeconds=0)](https://github.com/Gourieff/ComfyUI-ReActor/issues?q=is%3Aissue+state%3Aclosed)
   ![License](https://img.shields.io/github/license/Gourieff/ComfyUI-ReActor)
 
-  [English](/README.md) | Русский
+  [English](/README.md) | Русский | [日本語](/README_JP.md)
 
 # ReActor Nodes для ComfyUI<br><sub><sup>-=Безопасно для работы | SFW-Friendly=-</sup></sub>
 
