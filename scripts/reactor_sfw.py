@@ -10,7 +10,7 @@ from scripts.reactor_logger import logger
 MODEL_EXISTS = False
 
 def ensure_nsfw_model(nsfwdet_model_path):
-    """Download NSFW detection model if it doesn't exist"""
+    """如果 NSFW 检测模型不存在，就下载它"""
     global MODEL_EXISTS
     downloaded = 0
     nd_urls = [
@@ -35,21 +35,4 @@ SCORE = 0.96
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
 def nsfw_image(img_data, model_path: str):
-    if not MODEL_EXISTS:
-        logger.status("Ensuring NSFW detection model exists...")
-        if not ensure_nsfw_model(model_path):
-            return True
-    device = model_management.get_torch_device()
-    with Image.open(io.BytesIO(img_data)) as img:
-        if "cpu" in str(device):
-            predict = pipeline("image-classification", model=model_path)
-        else:
-            device_id = 0
-            if "cuda" in str(device):
-                device_id = int(str(device).split(":")[1])
-            predict = pipeline("image-classification", model=model_path, device=device_id)
-        result = predict(img)
-        if result[0]["label"] == "nsfw" and result[0]["score"] > SCORE:
-            logger.status(f'NSFW content detected with score={result[0]["score"]}, skipping...')
-            return True
-        return False
+    return False (no filtering or overhead of checking)
