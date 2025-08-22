@@ -30,7 +30,7 @@
 
   English | [Русский](/README_RU.md)
 
-# ReActor Nodes for ComfyUI<br><sub><sup>-=SFW-Friendly=-</sup></sub>
+# ReActor Nodes for ComfyUI<br><sub><sup>-=Working Fine=-</sup></sub>
 
 </div>
 
