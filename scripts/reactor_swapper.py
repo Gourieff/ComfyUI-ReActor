@@ -369,7 +369,7 @@ def swap_face(
                                 bgr_fake, M = face_swapper.get(result, target_face, source_face, paste_back=False)
                                 bgr_fake, scale = restorer.get_restored_face(bgr_fake, face_restore_model, face_restore_visibility, codeformer_weight, interpolation)
                                 M *= scale
-                                result = swapper.in_swap(target_img, bgr_fake, M)
+                                result = swapper.in_swap(result, bgr_fake, M)
                             else:
                                 result = face_swapper.get(result, target_face, source_face)
                             bbox = [tuple(map(float, target_face.bbox))]
