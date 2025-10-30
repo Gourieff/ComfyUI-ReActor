@@ -24,16 +24,8 @@ from .nodes import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
 
-# Clean up imports
 # Remove repo directory from path
 sys.path.remove(repo_dir)
-# Remove any new modules
-modules_to_remove = []
-for module in sys.modules:
-    if module not in original_modules and not module.startswith("google.protobuf") and not module.startswith("onnx") and not module.startswith("cv2"):
-        modules_to_remove.append(module)
-for module in modules_to_remove:
-    del sys.modules[module]
 
 # Restore original modules
 sys.modules.update(original_webui_modules)
