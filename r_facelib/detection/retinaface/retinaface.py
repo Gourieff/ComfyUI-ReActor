@@ -1,10 +1,8 @@
-import cv2
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
-from torchvision.models._utils import IntermediateLayerGetter as IntermediateLayerGetter
 
 from modules import shared
 
@@ -91,6 +89,7 @@ def generate_config(network_name):
 class RetinaFace(nn.Module):
 
     def __init__(self, network_name='resnet50', half=False, phase='test'):
+        from torchvision.models._utils import IntermediateLayerGetter  # Lazy: torchvision is heavy (~3.7s)
         super(RetinaFace, self).__init__()
         self.half_inference = half
         cfg = generate_config(network_name)
@@ -182,6 +181,7 @@ class RetinaFace(nn.Module):
 
     # single image detection
     def transform(self, image, use_origin_size):
+        import cv2  # Lazy: cv2 is heavy
         # convert to opencv format
         if isinstance(image, Image.Image):
             image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
@@ -288,6 +288,7 @@ class RetinaFace(nn.Module):
                 type=np.float32, BGR format).
             use_origin_size: whether to use origin size.
         """
+        import cv2  # Lazy: cv2 is heavy
         from_PIL = True if isinstance(frames[0], Image.Image) else False
 
         # convert to opencv format

@@ -2,16 +2,12 @@ import os
 from PIL import Image
 import numpy as np
 import torch
-from torchvision.utils import make_grid
-import cv2
 import math
 import logging
 import hashlib
-from insightface.app.common import Face
 from safetensors.torch import save_file, safe_open
 from tqdm import tqdm
 import urllib.request
-import onnxruntime
 from typing import Any
 import folder_paths
 from comfy.utils import ProgressBar
@@ -74,6 +70,7 @@ def batched_pil_to_tensor(images):
 
 
 def img2tensor(imgs, bgr2rgb=True, float32=True):
+    import cv2  # Lazy: cv2 is heavy
 
     def _totensor(img, bgr2rgb, float32):
         if img.shape[2] == 3 and bgr2rgb:
@@ -92,6 +89,8 @@ def img2tensor(imgs, bgr2rgb=True, float32=True):
 
 
 def tensor2img(tensor, rgb2bgr=True, out_type=np.uint8, min_max=(0, 1)):
+    import cv2  # Lazy: cv2 is heavy
+    from torchvision.utils import make_grid  # Lazy: torchvision is heavy (~3.7s)
 
     if not (torch.is_tensor(tensor) or (isinstance(tensor, list) and all(torch.is_tensor(t) for t in tensor))):
         raise TypeError(f'tensor or list of tensors expected, got {type(tensor)}')
@@ -181,7 +180,7 @@ def get_image_md5hash(image: Image.Image):
     return md5hash.hexdigest()
 
 
-def save_face_model(face: Face, filename: str) -> None:
+def save_face_model(face, filename: str) -> None:
     try:
         tensors = {
             "bbox": torch.tensor(face["bbox"]),
@@ -201,6 +200,7 @@ def save_face_model(face: Face, filename: str) -> None:
 
 
 def load_face_model(filename: str):
+    from insightface.app.common import Face  # Lazy: insightface is heavy (~2s)
     face = {}
     with safe_open(filename, framework="pt") as f:
         for k in f.keys():
@@ -213,6 +213,7 @@ def get_ort_session():
     return ORT_SESSION
 
 def set_ort_session(model_path, providers) -> Any:
+    import onnxruntime  # Lazy: onnxruntime loads native extensions
     global ORT_SESSION
     onnxruntime.set_default_logger_severity(3)
     ORT_SESSION = onnxruntime.InferenceSession(model_path, providers=providers)

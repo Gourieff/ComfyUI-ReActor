@@ -1,17 +1,12 @@
 import numpy as np
-import cv2
 from PIL import Image
 
 import scripts.r_masking.core as core
 from reactor_utils import tensor_to_pil
 
-try:
-    from ultralytics import YOLO
-except Exception as e:
-    print(e)
-
 
 def load_yolo(model_path: str):
+    from ultralytics import YOLO  # Lazy: ultralytics is heavy, only needed when loading YOLO models
     try:
         return YOLO(model_path)
     except ModuleNotFoundError:
@@ -25,6 +20,7 @@ def inference_bbox(
     confidence: float = 0.3,
     device: str = "",
 ):
+    import cv2  # Lazy: cv2 is heavy, deferred to avoid import-time cost
     pred = model(image, conf=confidence, device=device)
 
     bboxes = pred[0].boxes.xyxy.cpu().numpy()

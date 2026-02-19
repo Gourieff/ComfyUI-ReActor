@@ -1,23 +1,21 @@
 import os.path as osp
 import glob
 import logging
-import insightface
-from insightface.model_zoo.model_zoo import ModelRouter, PickableInferenceSession
-from insightface.model_zoo.retinaface import RetinaFace
-from insightface.model_zoo.landmark import Landmark
-from insightface.model_zoo.attribute import Attribute
-from insightface.model_zoo.inswapper import INSwapper
-from insightface.model_zoo.arcface_onnx import ArcFaceONNX
-from insightface.app import FaceAnalysis
-from insightface.utils import DEFAULT_MP_NAME, ensure_available
-from insightface.model_zoo import model_zoo
-import onnxruntime
-import onnx
-from onnx import numpy_helper
 from scripts.reactor_logger import logger
+
+# All insightface imports are deferred to apply_patch() / patch_insightface()
+# to avoid the ~2s import cost at module load time.
+# The patched_* functions below reference insightface types only when called
+# at runtime (after the user triggers face analysis), not at import time.
 
 
 def patched_get_model_log(self, **kwargs):
+    from insightface.model_zoo.model_zoo import PickableInferenceSession
+    from insightface.model_zoo.retinaface import RetinaFace
+    from insightface.model_zoo.landmark import Landmark
+    from insightface.model_zoo.attribute import Attribute
+    from insightface.model_zoo.inswapper import INSwapper
+    from insightface.model_zoo.arcface_onnx import ArcFaceONNX
     session = PickableInferenceSession(self.onnx_file, **kwargs)
     print(f'Applied providers: {session._providers}, with options: {session._provider_options}')
     inputs = session.get_inputs()
@@ -41,6 +39,12 @@ def patched_get_model_log(self, **kwargs):
         return None
 
 def patched_get_model(self, **kwargs):
+    from insightface.model_zoo.model_zoo import PickableInferenceSession
+    from insightface.model_zoo.retinaface import RetinaFace
+    from insightface.model_zoo.landmark import Landmark
+    from insightface.model_zoo.attribute import Attribute
+    from insightface.model_zoo.inswapper import INSwapper
+    from insightface.model_zoo.arcface_onnx import ArcFaceONNX
     session = PickableInferenceSession(self.onnx_file, **kwargs)
     inputs = session.get_inputs()
     input_cfg = inputs[0]
@@ -63,7 +67,12 @@ def patched_get_model(self, **kwargs):
         return None
 
 
-def patched_faceanalysis_init(self, name=DEFAULT_MP_NAME, root='~/.insightface', allowed_modules=None, **kwargs):
+def patched_faceanalysis_init(self, name=None, root='~/.insightface', allowed_modules=None, **kwargs):
+    import onnxruntime
+    from insightface.utils import DEFAULT_MP_NAME, ensure_available
+    from insightface.model_zoo import model_zoo
+    if name is None:
+        name = DEFAULT_MP_NAME
     onnxruntime.set_default_logger_severity(3)
     self.models = {}
     self.model_dir = ensure_available('models', name, root=root)
@@ -97,6 +106,9 @@ def patched_faceanalysis_prepare(self, ctx_id, det_thresh=0.5, det_size=(640, 64
 
 
 def patched_inswapper_init(self, model_file=None, session=None):
+    import onnxruntime
+    import onnx
+    from onnx import numpy_helper
     self.model_file = model_file
     self.session = session
     model = onnx.load(self.model_file)
@@ -137,6 +149,10 @@ def pathced_retinaface_prepare(self, ctx_id, **kwargs):
 
 
 def patch_insightface(get_model, faceanalysis_init, faceanalysis_prepare, inswapper_init, retinaface_prepare):
+    import insightface
+    from insightface.model_zoo.inswapper import INSwapper
+    from insightface.model_zoo.retinaface import RetinaFace
+    from insightface.app import FaceAnalysis
     insightface.model_zoo.model_zoo.ModelRouter.get_model = get_model
     insightface.app.FaceAnalysis.__init__ = faceanalysis_init
     insightface.app.FaceAnalysis.prepare = faceanalysis_prepare
@@ -144,8 +160,17 @@ def patch_insightface(get_model, faceanalysis_init, faceanalysis_prepare, inswap
     insightface.model_zoo.retinaface.RetinaFace.prepare = retinaface_prepare
 
 
-# original_functions = [ModelRouter.get_model, FaceAnalysis.__init__, FaceAnalysis.prepare, INSwapper.__init__, RetinaFace.prepare]
-original_functions = [patched_get_model_log, FaceAnalysis.__init__, FaceAnalysis.prepare, INSwapper.__init__, RetinaFace.prepare]
+# original_functions and patched_functions are resolved lazily inside apply_patch
+# because they reference insightface classes that we don't want to import at module level.
+
+def _get_original_functions():
+    """Resolve original insightface methods at call time, not import time."""
+    from insightface.app import FaceAnalysis
+    from insightface.model_zoo.inswapper import INSwapper
+    from insightface.model_zoo.retinaface import RetinaFace
+    return [patched_get_model_log, FaceAnalysis.__init__, FaceAnalysis.prepare, INSwapper.__init__, RetinaFace.prepare]
+
+
 patched_functions = [patched_get_model, patched_faceanalysis_init, patched_faceanalysis_prepare, patched_inswapper_init, pathced_retinaface_prepare]
 
 
@@ -157,5 +182,5 @@ def apply_patch(console_log_level):
         patch_insightface(*patched_functions)
         logger.setLevel(logging.STATUS)
     elif console_log_level == 2:
-        patch_insightface(*original_functions)
+        patch_insightface(*_get_original_functions())
         logger.setLevel(logging.INFO)

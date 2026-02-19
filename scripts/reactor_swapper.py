@@ -2,14 +2,9 @@ import os
 import shutil
 from typing import List, Union
 
-import cv2
 import numpy as np
 from PIL import Image
 
-import onnxruntime as ort
-
-import insightface
-from insightface.app.common import Face
 import torch
 
 import folder_paths
@@ -99,6 +94,7 @@ def get_current_faces_model():
     return SOURCE_FACES
 
 def getAnalysisModel(det_size = (640, 640)):
+    import insightface  # Lazy: insightface drags in albumentations+matplotlib (~2s)
     global ANALYSIS_MODELS
     ANALYSIS_MODEL = ANALYSIS_MODELS[str(det_size[0])]
     if ANALYSIS_MODEL is None:
@@ -110,6 +106,8 @@ def getAnalysisModel(det_size = (640, 640)):
     return ANALYSIS_MODEL
 
 def getFaceSwapModel(model_path: str):
+    import insightface  # Lazy: insightface is heavy (~2s)
+    import onnxruntime as ort  # Lazy: onnxruntime loads native extensions
     global FS_MODEL, CURRENT_FS_MODEL_PATH
     if FS_MODEL is None or CURRENT_FS_MODEL_PATH is None or CURRENT_FS_MODEL_PATH != model_path:
         CURRENT_FS_MODEL_PATH = model_path
@@ -142,11 +140,13 @@ def get_landmarks_5(face):
 
 # Функция для вычисления аффинного преобразования
 def get_affine_transform(src_pts, dst_pts):
+    import cv2  # Lazy: cv2 is heavy
     M, _ = cv2.estimateAffinePartial2D(src_pts, dst_pts)
     return M
 
-# Создаём градиентную маску овальной формы без обрезки 
+# Создаём градиентную маску овальной формы без обрезки
 def create_gradient_mask(crop_size=256):
+    import cv2  # Lazy: cv2 is heavy
     # 1. Создаём пустую маску (все пиксели = 0)
     mask = np.zeros((crop_size, crop_size), dtype=np.float32)
     
@@ -176,7 +176,7 @@ def create_gradient_mask(crop_size=256):
     return mask
 
 def paste_back(target_img, swapped_face, M, crop_size=256):
-    
+    import cv2  # Lazy: cv2 is heavy
     # 1. Создание мягкой маски (Эрозия + Размытие)
     mask = create_gradient_mask(crop_size)
 
@@ -222,12 +222,14 @@ def paste_back(target_img, swapped_face, M, crop_size=256):
     return result
 
 def visualize_points(img, points, color=(0, 255, 0)):
+    import cv2  # Lazy: cv2 is heavy
     img = img.copy()
     for p in points:
         cv2.circle(img, tuple(p.astype(int)), 3, color, -1)
 
 # Итоговая функция run_hyperswap с аффинным преобразованием
 def run_hyperswap(session, source_face, target_face, target_img):
+    import cv2  # Lazy: cv2 is heavy
     # 1. Подготовка эмбеддинга
     source_embedding = source_face.normed_embedding.reshape(1, -1).astype(np.float32)
 
@@ -383,7 +385,7 @@ def swap_face(
     faces_index: List[int] = [0],
     gender_source: int = 0,
     gender_target: int = 0,
-    face_model: Union[Face, None] = None,
+    face_model = None,
     faces_order: List = ["large-small", "large-small"],
     face_boost_enabled: bool = False,
     face_restore_model = None,
@@ -391,6 +393,7 @@ def swap_face(
     codeformer_weight: float = 0.5,
     interpolation: str = "Bicubic",
 ):
+    import cv2  # Lazy: cv2 is heavy
     global SOURCE_FACES, SOURCE_IMAGE_HASH, TARGET_FACES, TARGET_IMAGE_HASH
     result_image = target_img
     bbox = []
@@ -556,7 +559,7 @@ def swap_face_many(
     faces_index: List[int] = [0],
     gender_source: int = 0,
     gender_target: int = 0,
-    face_model: Union[Face, None] = None,
+    face_model = None,
     faces_order: List = ["large-small", "large-small"],
     face_boost_enabled: bool = False,
     face_restore_model = None,
@@ -564,6 +567,7 @@ def swap_face_many(
     codeformer_weight: float = 0.5,
     interpolation: str = "Bicubic",
 ):
+    import cv2  # Lazy: cv2 is heavy
     global SOURCE_FACES, SOURCE_IMAGE_HASH, TARGET_FACES, TARGET_IMAGE_HASH, TARGET_FACES_LIST, TARGET_IMAGE_LIST_HASH
     result_images = target_imgs
     bbox = []

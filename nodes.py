@@ -3,19 +3,12 @@ import logging
 
 import torch
 import torch.nn.functional as F
-import torchvision.transforms as T
-from torchvision.transforms.functional import normalize
-from torchvision.ops import masks_to_boxes
 
 import numpy as np
-import cv2
 import math
 from typing import List
 from PIL import Image
 import io
-from scipy import stats
-from insightface.app.common import Face
-from segment_anything import sam_model_registry
 
 from modules.processing import ProcessingImg2Img
 from modules.shared import state
@@ -56,7 +49,8 @@ from reactor_utils import (
     progress_bar_reset
 )
 from reactor_patcher import apply_patch
-from r_facelib.utils.face_restoration_helper import FaceRestoreHelper
+# FaceRestoreHelper import deferred to function bodies to avoid pulling in
+# torchvision (~3.7s) and cv2 at module load time via r_facelib.detection.
 from r_basicsr.utils.registry import ARCH_REGISTRY
 import scripts.r_archs.codeformer_arch
 import scripts.r_masking.subcore as subcore
@@ -183,12 +177,10 @@ class reactor:
         codeformer_weight,
         facedetection,
     ):
+        import cv2  # Lazy: cv2 is heavy
+        from torchvision.transforms.functional import normalize  # Lazy: torchvision is heavy (~3.7s)
+        from r_facelib.utils.face_restoration_helper import FaceRestoreHelper  # Lazy: pulls in torchvision+cv2 via r_facelib.detection
 
-        # from datetime import datetime
-        # def _current_time():
-        #     current_datetime = datetime.now()
-        #     return current_datetime.strftime("%M:%S")
-        
         # локальная функция IoU
         def _iou(b1, b2):
             xA = max(b1[0], b2[0])
@@ -624,6 +616,7 @@ class ReActorWeight:
     CATEGORY = "🌌 ReActor"
 
     def set_weight(self, input_image, faceswap_weight, face_model=None, source_image=None):
+        from insightface.app.common import Face  # Lazy: insightface is heavy (~2s)
 
         if input_image is None:
             logger.error("Please provide `input_image`")
@@ -728,6 +721,7 @@ class BuildFaceModel:
     CATEGORY = "🌌 ReActor"
 
     def build_face_model(self, image: Image.Image, det_size=(640, 640)):
+        import cv2  # Lazy: cv2 is heavy
         logging.StreamHandler.terminator = "\n"
         if image is None:
             error_msg = "Please load an Image"
@@ -751,6 +745,8 @@ class BuildFaceModel:
             return no_face_msg
 
     def blend_faces(self, save_mode, send_only, face_model_name, compute_method, images=None, face_models=None):
+        from insightface.app.common import Face  # Lazy: insightface is heavy (~2s)
+        from scipy import stats  # Lazy: scipy.stats loads Fortran extensions (~1.75s)
         global BLENDED_FACE_MODEL
         blended_face: Face = BLENDED_FACE_MODEL
 
@@ -858,6 +854,7 @@ class SaveFaceModel:
     CATEGORY = "🌌 ReActor"
 
     def save_model(self, save_mode, face_model_name, select_face_index, image=None, face_model=None, det_size=(640, 640)):
+        import cv2  # Lazy: cv2 is heavy
         if save_mode and image is not None:
             source = tensor_to_pil(image)
             source = cv2.cvtColor(np.array(source), cv2.COLOR_RGB2BGR)
@@ -932,6 +929,9 @@ class RestoreFaceAdvanced:
     def execute(
             self, image, model, visibility, codeformer_weight, facedetection, face_selection, sort_by="area", reverse_order=False, take_start=0, take_count=1
         ):
+        import cv2  # Lazy: cv2 is heavy
+        from torchvision.transforms.functional import normalize  # Lazy: torchvision is heavy (~3.7s)
+        from r_facelib.utils.face_restoration_helper import FaceRestoreHelper  # Lazy: pulls in torchvision+cv2 via r_facelib.detection
 
         min_x_position=0.0
         max_x_position=1.0
@@ -1213,6 +1213,10 @@ class MaskHelper:
     CATEGORY = "🌌 ReActor"
 
     def execute(self, image, swapped_image, bbox_model_name, bbox_threshold, bbox_dilation, bbox_crop_factor, bbox_drop_size, sam_model_name, sam_dilation, sam_threshold, bbox_expansion, mask_hint_threshold, mask_hint_use_negative, morphology_operation, morphology_distance, blur_radius, sigma_factor, mask_optional=None):
+        import cv2  # Lazy: cv2 is heavy
+        import torchvision.transforms as T  # Lazy: torchvision is heavy (~3.7s)
+        from torchvision.ops import masks_to_boxes  # Lazy: torchvision is heavy
+        from segment_anything import sam_model_registry  # Lazy: segment_anything is heavy
         device = model_management.get_torch_device()
 
         # Оптимально перемещаем тензоры

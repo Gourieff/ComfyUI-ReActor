@@ -1,13 +1,9 @@
 import numpy as np
-import cv2
 import torch
-import torchvision.transforms.functional as TF
 
 import sys as _sys
 from keyword import iskeyword as _iskeyword
 from operator import itemgetter as _itemgetter
-
-from segment_anything import SamPredictor
 
 from comfy import model_management
 
@@ -274,6 +270,7 @@ def create_segmasks(results):
     return results
 
 def dilate_masks(segmasks, dilation_factor, iter=1):
+    import cv2  # Lazy: cv2 is heavy, deferred to avoid import-time cost
     if dilation_factor == 0:
         return segmasks
 
@@ -471,6 +468,7 @@ def generate_detection_hints(image, seg, center, detection_hint, dilated_bbox, m
     return points, plabs
 
 def combine_masks2(masks):
+    import cv2  # Lazy: cv2 is heavy, deferred to avoid import-time cost
     if len(masks) == 0:
         return None
     else:
@@ -490,6 +488,7 @@ def combine_masks2(masks):
         return mask
 
 def dilate_mask(mask, dilation_factor, iter=1):
+    import cv2  # Lazy: cv2 is heavy, deferred to avoid import-time cost
     if dilation_factor == 0:
         return make_2d_mask(mask)
 
@@ -541,6 +540,7 @@ def merge_and_stack_masks(stacked_masks, group_size):
 
 def make_sam_mask_segmented(sam_model, segs, image, detection_hint, dilation,
                             threshold, bbox_expansion, mask_hint_threshold, mask_hint_use_negative):
+    from segment_anything import SamPredictor  # Lazy: segment_anything is heavy, only needed for SAM inference
     if getattr(sam_model, 'is_auto_mode', False):
         device = model_management.get_torch_device()
         # sam_model.safe_to.to_device(sam_model, device=device)
@@ -633,6 +633,7 @@ def make_sam_mask_segmented(sam_model, segs, image, detection_hint, dilation,
     return (mask, merge_and_stack_masks(stacked_masks, group_size=3))
 
 def tensor2mask(t: torch.Tensor) -> torch.Tensor:
+    import torchvision.transforms.functional as TF  # Lazy: torchvision is heavy (~3.7s)
     size = t.size()
     if (len(size) < 4):
         return t
