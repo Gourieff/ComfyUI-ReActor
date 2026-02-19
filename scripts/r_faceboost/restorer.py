@@ -1,8 +1,6 @@
 import sys
-import cv2
 import numpy as np
 import torch
-from torchvision.transforms.functional import normalize
 
 try:
     import torch.cuda as cuda
@@ -39,6 +37,7 @@ def get_restored_face(cropped_face,
                       face_restore_visibility,
                       codeformer_weight,
                       interpolation: str = "Bicubic"):
+    import cv2  # Lazy: cv2 is heavy, deferred to avoid import-time cost
 
     if interpolation == "Bicubic":
         interpolate = cv2.INTER_CUBIC
@@ -68,6 +67,7 @@ def get_restored_face(cropped_face,
     model_path = folder_paths.get_full_path("facerestore_models", face_restore_model)
     device = model_management.get_torch_device()
 
+    from torchvision.transforms.functional import normalize  # Lazy: torchvision is heavy (~3.7s)
     cropped_face_t = img2tensor(cropped_face / 255., bgr2rgb=True, float32=True)
     normalize(cropped_face_t, (0.5, 0.5, 0.5), (0.5, 0.5, 0.5), inplace=True)
     cropped_face_t = cropped_face_t.unsqueeze(0).to(device)

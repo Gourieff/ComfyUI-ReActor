@@ -1,10 +1,10 @@
-import cv2
 import numpy as np
 
 # The following code is almost entirely copied from INSwapper; the only change here is that we want to use Lanczos
 # interpolation for the warpAffine call. Now that the face has been restored, Lanczos represents a good compromise
 # whether the restored face needs to be upscaled or downscaled.
 def in_swap(img, bgr_fake, M):
+    import cv2  # Lazy: cv2 is heavy, deferred to avoid import-time cost
     target_img = img
     IM = cv2.invertAffineTransform(M)
     img_white = np.full((bgr_fake.shape[0], bgr_fake.shape[1]), 255, dtype=np.float32)

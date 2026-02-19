@@ -1,4 +1,3 @@
-import cv2
 import os
 import os.path as osp
 import torch
@@ -48,6 +47,7 @@ def imwrite(img, file_path, params=None, auto_mkdir=True):
     Returns:
         bool: Successful or not.
     """
+    import cv2  # Lazy: cv2 is heavy
     if auto_mkdir:
         dir_name = os.path.abspath(os.path.dirname(file_path))
         os.makedirs(dir_name, exist_ok=True)
@@ -68,6 +68,7 @@ def img2tensor(imgs, bgr2rgb=True, float32=True):
     """
 
     def _totensor(img, bgr2rgb, float32):
+        import cv2  # Lazy: cv2 is heavy
         if img.shape[2] == 3 and bgr2rgb:
             if img.dtype == 'float64':
                 img = img.astype('float32')

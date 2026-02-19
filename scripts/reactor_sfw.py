@@ -1,4 +1,3 @@
-from transformers import pipeline
 from PIL import Image
 import io
 import logging
@@ -35,6 +34,7 @@ SCORE = 0.969
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
 def nsfw_image(img_data, model_path: str):
+    from transformers import pipeline  # Lazy: heavy import, only needed at inference time
     if not MODEL_EXISTS:
         logger.status("Ensuring NSFW detection model exists...")
         if not ensure_nsfw_model(model_path):

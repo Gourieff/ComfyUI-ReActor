@@ -1,8 +1,6 @@
-import cv2
 import numpy as np
 import os
 import torch
-from torchvision.transforms.functional import normalize
 
 from r_facelib.detection import init_detection_model
 from r_facelib.parsing import init_parsing_model
@@ -113,6 +111,7 @@ class FaceRestoreHelper(object):
 
     def read_image(self, img):
         """img can be image path or cv2 loaded image."""
+        import cv2  # Lazy: cv2 is heavy
         # self.input_img is Numpy array, (h, w, c), BGR, uint8, [0, 255]
         if isinstance(img, str):
             img = cv2.imread(img)
@@ -136,6 +135,7 @@ class FaceRestoreHelper(object):
                              resize=None,
                              blur_ratio=0.01,
                              eye_dist_threshold=None):
+        import cv2  # Lazy: cv2 is heavy
         if resize is None:
             scale = 1
             input_img = self.input_img
@@ -251,8 +251,8 @@ class FaceRestoreHelper(object):
         return len(self.all_landmarks_5)
 
     def align_warp_face(self, save_cropped_path=None, border_mode='constant'):
-        """Align and warp faces with face template.
-        """
+        """Align and warp faces with face template."""
+        import cv2  # Lazy: cv2 is heavy
         if self.pad_blur:
             assert len(self.pad_input_imgs) == len(
                 self.all_landmarks_5), f'Mismatched samples: {len(self.pad_input_imgs)} and {len(self.all_landmarks_5)}'
@@ -284,6 +284,7 @@ class FaceRestoreHelper(object):
 
     def get_inverse_affine(self, save_inverse_affine_path=None):
         """Get inverse affine matrix."""
+        import cv2  # Lazy: cv2 is heavy
         for idx, affine_matrix in enumerate(self.affine_matrices):
             inverse_affine = cv2.invertAffineTransform(affine_matrix)
             inverse_affine *= self.upscale_factor
@@ -300,6 +301,8 @@ class FaceRestoreHelper(object):
 
 
     def paste_faces_to_input_image(self, save_path=None, upsample_img=None, draw_box=False, face_upsampler=None):
+        import cv2  # Lazy: cv2 is heavy
+        from torchvision.transforms.functional import normalize  # Lazy: torchvision is heavy (~3.7s)
         h, w, _ = self.input_img.shape
         h_up, w_up = int(h * self.upscale_factor), int(w * self.upscale_factor)
 
