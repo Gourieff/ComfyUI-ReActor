@@ -2,14 +2,14 @@ import os, glob
 
 from PIL import Image
 
-import modules.scripts as scripts
+import r_modules.scripts as scripts
 # from modules.upscaler import Upscaler, UpscalerData
-from modules import scripts, scripts_postprocessing
-from modules.processing import (
+from r_modules import scripts, scripts_postprocessing
+from r_modules.processing import (
     Processing,
     ProcessingImg2Img,
 )
-from modules.shared import state
+from r_modules.shared import state
 from scripts.reactor_logger import logger
 from scripts.reactor_swapper import (
     swap_face,

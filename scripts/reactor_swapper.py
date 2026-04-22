@@ -8,13 +8,14 @@ from PIL import Image
 
 import onnxruntime as ort
 
-import insightface
-from insightface.app.common import Face
+from reactor_core.analyzer import ReActorFaceAnalysis
+from reactor_core.face_objects import Face
+from reactor_core.face_models import INSwapper
 import torch
 
 import folder_paths
 import comfy.model_management as model_management
-from modules.shared import state
+from r_modules.shared import state
 
 from scripts.reactor_logger import logger
 from reactor_utils import (
@@ -102,7 +103,7 @@ def getAnalysisModel(det_size = (640, 640)):
     global ANALYSIS_MODELS
     ANALYSIS_MODEL = ANALYSIS_MODELS[str(det_size[0])]
     if ANALYSIS_MODEL is None:
-        ANALYSIS_MODEL = insightface.app.FaceAnalysis(
+        ANALYSIS_MODEL = ReActorFaceAnalysis(
             name="buffalo_l", providers=providers, root=insightface_path
         )
     ANALYSIS_MODEL.prepare(ctx_id=0, det_size=det_size)
@@ -119,11 +120,10 @@ def getFaceSwapModel(model_path: str):
         if "hyperswap" in model_filename.lower():
             model_path = os.path.join(folder_paths.models_dir, "hyperswap", model_filename)
             FS_MODEL = ort.InferenceSession(model_path, providers=providers)
-        elif "reswapper" in model_filename.lower():
-            model_path = os.path.join(folder_paths.models_dir, "reswapper", model_filename)
-            FS_MODEL = insightface.model_zoo.get_model(model_path, providers=providers)
         else:
-            FS_MODEL = insightface.model_zoo.get_model(model_path, providers=providers)
+            if "reswapper" in model_filename.lower():
+                model_path = os.path.join(folder_paths.models_dir, "reswapper", model_filename)
+            FS_MODEL = INSwapper(model_path, providers=providers)
 
     return FS_MODEL
 

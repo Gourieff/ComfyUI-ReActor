@@ -7,6 +7,7 @@ import torchvision.transforms as T
 from torchvision.transforms.functional import normalize
 from torchvision.ops import masks_to_boxes
 
+import onnxruntime
 import numpy as np
 import cv2
 import math
@@ -14,12 +15,12 @@ from typing import List
 from PIL import Image
 import io
 from scipy import stats
-from insightface.app.common import Face
+from reactor_core.face_objects import Face
 from segment_anything import sam_model_registry
 
-from modules.processing import ProcessingImg2Img
-from modules.shared import state
-# from comfy_extras.chainner_models import model_loading
+from r_modules.processing import ProcessingImg2Img
+from r_modules.shared import state
+
 import comfy.model_management as model_management
 import comfy.utils
 import folder_paths
@@ -55,7 +56,7 @@ from reactor_utils import (
     progress_bar,
     progress_bar_reset
 )
-from reactor_patcher import apply_patch
+
 from r_facelib.utils.face_restoration_helper import FaceRestoreHelper
 from r_basicsr.utils.registry import ARCH_REGISTRY
 import scripts.r_archs.codeformer_arch
@@ -90,6 +91,17 @@ if "ultralytics" not in folder_paths.folder_names_and_paths:
     add_folder_path_and_extensions("ultralytics", [os.path.join(models_dir, "ultralytics")], folder_paths.supported_pt_extensions)
 if "sams" not in folder_paths.folder_names_and_paths:
     add_folder_path_and_extensions("sams", [os.path.join(models_dir, "sams")], folder_paths.supported_pt_extensions)
+
+def apply_log_level(console_log_level):
+    if console_log_level == 0:
+        logger.setLevel(logging.WARNING)
+        onnxruntime.set_default_logger_severity(3) # Убивает ворнинги ORT
+    elif console_log_level == 1:
+        logger.setLevel(logging.STATUS)
+        onnxruntime.set_default_logger_severity(3)
+    elif console_log_level == 2:
+        logger.setLevel(logging.INFO)
+        onnxruntime.set_default_logger_severity(0)
 
 def get_facemodels():
     models_path = os.path.join(FACE_MODELS_PATH, "*")
@@ -423,7 +435,7 @@ class reactor:
         if faces_order is None:
             faces_order = self.faces_order
 
-        apply_patch(console_log_level)
+        apply_log_level(console_log_level)
 
         if not enabled:
             return (input_image,face_model)
@@ -666,7 +678,7 @@ class ReActorWeight:
         
         images_list: List[Image.Image] = []
 
-        apply_patch(1)
+        apply_log_level(0)
 
         if len(images) > 0:
 
@@ -762,7 +774,7 @@ class BuildFaceModel:
             faces = []
             embeddings = []
 
-            apply_patch(1)
+            apply_log_level(0)
 
             if images is not None:
                 images_list: List[Image.Image] = batch_tensor_to_pil(images)
@@ -861,7 +873,7 @@ class SaveFaceModel:
         if save_mode and image is not None:
             source = tensor_to_pil(image)
             source = cv2.cvtColor(np.array(source), cv2.COLOR_RGB2BGR)
-            apply_patch(1)
+            apply_log_level(0)
             logger.status("Building Face Model...")
             face_model_raw = analyze_faces(source, det_size)
             if len(face_model_raw) == 0:
