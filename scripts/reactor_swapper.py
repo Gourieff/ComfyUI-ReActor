@@ -186,38 +186,47 @@ def paste_back(target_img, swapped_face, M, crop_size=256):
     # 2. Получаем размеры целевого изображения
     h, w = target_img.shape[:2]
 
-    # 3. Обратное преобразование (WARP_INVERSE_MAP) для лица И маски
-    # Для лица (INTER_LANCZOS4 — высококачественная интерполяция)
-    inv_face = cv2.warpAffine(
-        swapped_face.astype(np.float32),
+    # 3. Нормализация swapped_face к float32 [0,1] для warp
+    swapped_face_norm = swapped_face.astype(np.float32) / 255.0
+    mask_norm = mask_3c.astype(np.float32)  # Маска уже [0,1]
+
+    # 4. Обратное преобразование (WARP_INVERSE_MAP) для лица И маски
+    # Используем BORDER_CONSTANT с borderValue=0.5 (серый, чтобы избежать синих/зеленых артефактов)
+    warped_face = cv2.warpAffine(
+        swapped_face_norm,
         M,
         (w, h),
         flags=cv2.INTER_LANCZOS4 | cv2.WARP_INVERSE_MAP,
-        borderMode=cv2.BORDER_TRANSPARENT
+        borderMode=cv2.BORDER_CONSTANT,
+        borderValue=0.5
     )
-
+    
     # Для маски (INTER_CUBIC — плавные границы)
-    inv_mask = cv2.warpAffine(
-        mask_3c,
+    warped_mask = cv2.warpAffine(
+        mask_norm,
         M,
         (w, h),
         flags=cv2.INTER_CUBIC | cv2.WARP_INVERSE_MAP,
-        borderMode=cv2.BORDER_TRANSPARENT
+        borderMode=cv2.BORDER_CONSTANT,
+        borderValue=0.0  # Маска: 0 за пределами
     )
+    
+    # 5. Обработка после warp: Clip, NaN fix
+    warped_face = np.clip(warped_face, 0, 1)  # Убираем отрицательные
+    warped_face = np.nan_to_num(warped_face, nan=0.5)  # NaN -> серый
+    
+    warped_mask = np.clip(warped_mask, 0, 1)
+    warped_mask = np.nan_to_num(warped_mask, nan=0.0)
+    
+    # 6. Дополнительное размытие для устранения артефактов
+    warped_mask = cv2.GaussianBlur(warped_mask, (3, 3), 0)
 
-    # 4. Ограничение значений маски [0, 1]
-    inv_mask = np.clip(inv_mask, 0, 1)
-
-    # 5. Дополнительное размытие для устранения артефактов
-    inv_mask = cv2.GaussianBlur(inv_mask, (3, 3), 0)
-
-    # 6. Плавное наложение
-    target_img_float = target_img.astype(np.float32)
-    inv_face_float = inv_face.astype(np.float32)
-    result = target_img_float * (1.0 - inv_mask) + inv_face_float * inv_mask
-
-    # 7. Ограничение результата [0, 255]
-    result = np.clip(result, 0, 255).astype(np.uint8)
+    # 7. Плавное наложение в float32
+    target_float = target_img.astype(np.float32) / 255.0
+    result_float = target_float * (1.0 - warped_mask) + warped_face * warped_mask
+    
+    # 8. Обратная нормализация к uint8
+    result = (result_float * 255).clip(0, 255).astype(np.uint8)
 
     return result
 
@@ -264,9 +273,23 @@ def run_hyperswap(session, source_face, target_face, target_img):
     except:
         return target_img
 
+    if isinstance(output, np.ndarray):
+        # устранение NaN и бесконечностей
+        output = np.nan_to_num(output, nan=0.0, posinf=255.0, neginf=0.0)
+
+        # если диапазон похож на [-1,1] → нормализуем в [0,255]
+        if output.min() < 0.0 or output.max() <= 1.5:
+            output = ((output + 1.0) / 2.0 * 255.0)
+        # жёсткое ограничение диапазона и тип для OpenCV
+        output = np.clip(output, 0, 255).astype(np.uint8).copy()
+
+        # защита от повторного использования буфера (inplace CPU bug)
+        try:
+            output.setflags(write=True)
+        except Exception:
+            pass
     # 6. Обратная нормализация
-    output = (output * 0.5 + 0.5) * 255.0  # [-1..1] -> [0..255]
-    output = np.clip(output, 0, 255).astype(np.uint8)
+
     output = output.transpose(1, 2, 0)  # CHW -> HWC
     output = output[:, :, ::-1]  # BGR -> RGB
     
