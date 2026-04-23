@@ -1,6 +1,42 @@
 import cv2
 import numpy as np
 from .face_objects import BaseONNXModel
+from .meanshape_68 import MEANSHAPE_68
+
+# --- Математика для 3D позы ---
+
+def estimate_affine_matrix_3d23d(X, Y):
+    ''' Вычисляет аффинную матрицу трансформации 3D -> 3D '''
+    X_homo = np.hstack((X, np.ones([X.shape[0], 1])))
+    P = np.linalg.lstsq(X_homo, Y, rcond=None)[0].T
+    return P
+
+def P2sRt(P):
+    ''' Разбивает матрицу проекции '''
+    t1 = np.linalg.norm(P[:,0])
+    t2 = np.linalg.norm(P[:,1])
+    t3 = np.linalg.norm(P[:,2])
+    s = (t1 + t2 + t3) / 3.0
+    P1 = P / s
+    R = P1[:, 0:3]
+    t = P1[:, 3]
+    return s, R, t
+
+def matrix2angle(R):
+    ''' Превращает матрицу поворота в углы Эйлера (pitch, yaw, roll) '''
+    if R[2,0] != 1 and R[2,0] != -1:
+        pitch = -np.arcsin(R[2,0])
+        yaw = np.arctan2(R[2,1]/np.cos(pitch), R[2,2]/np.cos(pitch))
+        roll = np.arctan2(R[1,0]/np.cos(pitch), R[0,0]/np.cos(pitch))
+    else:
+        yaw = 0
+        if R[2,0] == -1:
+            pitch = np.pi/2
+            roll = yaw + np.arctan2(R[0,1], R[0,2])
+        else:
+            pitch = -np.pi/2
+            roll = -yaw + np.arctan2(-R[0,1], -R[0,2])
+    return pitch, yaw, roll
 
 # --- Вспомогательные функции ---
 
@@ -391,13 +427,14 @@ class Landmark(BaseONNXModel):
         else:
             pred = pred_xy
 
-        # Сохраняем в объект Face под правильным именем (например, landmark_3d_68)
+        # Сохраняем в объект Face под правильным именем
         setattr(face, self.taskname, pred)
         
-        # Для обратной совместимости нод ReActor'a с 3D моделью
+        # Честный расчет 3D позы
         if self.taskname == 'landmark_3d_68':
-            # Вместо расчета Euler углов через PKL-файл insightface, 
-            # мы отдаем нулевой вектор (pitch, yaw, roll). Он нужен только для структуры safetensors.
-            face.pose = np.zeros(3, dtype=np.float32) 
+            P = estimate_affine_matrix_3d23d(MEANSHAPE_68, pred)
+            _, R, _ = P2sRt(P)
+            rx, ry, rz = matrix2angle(R)
+            face.pose = np.array([rx, ry, rz], dtype=np.float32)
             
         return pred
