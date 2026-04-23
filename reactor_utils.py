@@ -7,7 +7,7 @@ import cv2
 import math
 import logging
 import hashlib
-from insightface.app.common import Face
+from reactor_core.face_objects import Face
 from safetensors.torch import save_file, safe_open
 from tqdm import tqdm
 import urllib.request
