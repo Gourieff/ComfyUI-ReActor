@@ -1652,6 +1652,7 @@ class ReActorFaceBoost:
         }
         return (face_boost, )
 
+
 class ReActorUnload:
     @classmethod
     def INPUT_TYPES(s):
@@ -1670,6 +1671,59 @@ class ReActorUnload:
         return (trigger,)
 
 
+class ReActorFaceSimilarity:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "image1": ("IMAGE",),
+                "image2": ("IMAGE",),
+            }
+        }
+
+    RETURN_TYPES = ("FLOAT", "STRING")
+    RETURN_NAMES = ("similarity_float", "similarity_text")
+    FUNCTION = "compare_faces"
+    CATEGORY = "🌌 ReActor"
+
+    def compare_faces(self, image1, image2):
+        
+        apply_log_level(0)
+
+        # 1. Конвертируем тензоры ComfyUI в формат OpenCV (BGR)
+        img1_cv = 255. * image1[0].cpu().numpy()
+        img1_cv = cv2.cvtColor(img1_cv.astype(np.uint8), cv2.COLOR_RGB2BGR)
+
+        img2_cv = 255. * image2[0].cpu().numpy()
+        img2_cv = cv2.cvtColor(img2_cv.astype(np.uint8), cv2.COLOR_RGB2BGR)
+
+        # 2. Ищем лица через
+        faces1 = analyze_faces(img1_cv, det_size=(640, 640))
+        faces2 = analyze_faces(img2_cv, det_size=(640, 640))
+
+        # 3. Защита от отсутствия лиц
+        if not faces1 or not faces2:
+            return (0.0, "Face not found in one or both images")
+
+        # Берем первые найденные лица
+        face1 = faces1[0]
+        face2 = faces2[0]
+
+        # 4. Вычисляем косинусное сходство (Cosine Similarity)
+        emb1 = face1.normed_embedding
+        emb2 = face2.normed_embedding
+        
+        # Скалярное произведение нормализованных векторов
+        similarity = np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
+
+        # 5. Форматируем результат
+        sim_float = float(similarity)
+        sim_float = max(0.0, min(1.0, sim_float)) 
+        sim_text = f"{sim_float * 100:.2f}%"
+
+        return (sim_float, sim_text)
+
+
 NODE_CLASS_MAPPINGS = {
     # --- MAIN NODES ---
     "ReActorFaceSwap": reactor,
@@ -1686,6 +1740,7 @@ NODE_CLASS_MAPPINGS = {
     # --- Additional Nodes ---
     "ReActorRestoreFace": RestoreFace,
     "ReActorRestoreFaceAdvanced": RestoreFaceAdvanced,
+    "ReActorFaceSimilarity": ReActorFaceSimilarity,
     "ReActorImageDublicator": ImageDublicator,
     "ImageRGBA2RGB": ImageRGBA2RGB,
     "ReActorUnload": ReActorUnload,
@@ -1707,6 +1762,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     # --- Additional Nodes ---
     "ReActorRestoreFace": "Restore Face 🌌 ReActor",
     "ReActorRestoreFaceAdvanced": "Restore Face Advanced 🌌 ReActor",
+    "ReActorFaceSimilarity": "Face Similarity 🌌 ReActor",
     "ReActorImageDublicator": "Image Dublicator (List) 🌌 ReActor",
     "ImageRGBA2RGB": "Convert RGBA to RGB 🌌 ReActor",
     "ReActorUnload": "Unload ReActor Models 🌌 ReActor",
