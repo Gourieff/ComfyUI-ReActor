@@ -30,7 +30,7 @@ def ensure_nsfw_model(nsfwdet_model_path):
     MODEL_EXISTS = True if downloaded == 3 else False
     return MODEL_EXISTS
 
-SCORE = 0.969
+SCORE = 0.979
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
