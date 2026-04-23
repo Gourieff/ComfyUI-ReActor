@@ -6,11 +6,10 @@ import cv2
 import numpy as np
 from PIL import Image
 
-import onnxruntime as ort
-
 from reactor_core.analyzer import ReActorFaceAnalysis
 from reactor_core.face_objects import Face
-from reactor_core.face_models import INSwapper
+from reactor_core.inswap import INSwapper
+from reactor_core.hyperswap import HyperSwapper
 import torch
 
 import folder_paths
@@ -81,11 +80,6 @@ TARGET_IMAGE_LIST_HASH = []
 
 def unload_model(model):
     if model is not None:
-        # check if model has unload method
-        # if "unload" in model:
-        #     model.unload()
-        # if "model_unload" in model:
-        #     model.model_unload()
         del model
     return None
 
@@ -117,184 +111,15 @@ def getFaceSwapModel(model_path: str):
         FS_MODEL = unload_model(FS_MODEL)
 
         model_filename = os.path.basename(model_path)
-        if "hyperswap" in model_filename.lower():
+        if "hyperswap" in model_filename.lower(): # Если это Hyperswap
             model_path = os.path.join(folder_paths.models_dir, "hyperswap", model_filename)
-            FS_MODEL = ort.InferenceSession(model_path, providers=providers)
-        else:
+            FS_MODEL = HyperSwapper(model_path, providers=providers)
+        else: # Если это INSwapper / Reswapper
             if "reswapper" in model_filename.lower():
                 model_path = os.path.join(folder_paths.models_dir, "reswapper", model_filename)
             FS_MODEL = INSwapper(model_path, providers=providers)
 
     return FS_MODEL
-
-
-# Функция для получения 5 ключевых точек из объекта Face
-def get_landmarks_5(face):
-    if hasattr(face, 'landmark_5') and face.landmark_5 is not None:
-        return face.landmark_5
-    elif hasattr(face, 'kps') and face.kps is not None:
-        return face.kps
-    elif hasattr(face, 'landmark') and face.landmark is not None:
-        if face.landmark.shape[0] >= 68:
-            idxs = [36, 45, 30, 48, 54]
-            return face.landmark[idxs]
-    return None
-
-# Функция для вычисления аффинного преобразования
-def get_affine_transform(src_pts, dst_pts):
-    M, _ = cv2.estimateAffinePartial2D(src_pts, dst_pts)
-    return M
-
-# Создаём градиентную маску овальной формы без обрезки 
-def create_gradient_mask(crop_size=256):
-    # 1. Создаём пустую маску (все пиксели = 0)
-    mask = np.zeros((crop_size, crop_size), dtype=np.float32)
-    
-    # 2. Определяем центр и размеры эллипса
-    center = (crop_size // 2, crop_size // 2)
-    axes = (int(crop_size * 0.35), int(crop_size * 0.4))
-    
-    # 3. Рисуем эллипс (заполняем белым цветом, значение=1.0)
-    cv2.ellipse(
-        mask,          # Массив для рисования
-        center,        # Центр эллипса
-        axes,          # Полуоси (ширина, высота)
-        angle=0,       # Угол поворота
-        startAngle=0,  # Начальный угол дуги
-        endAngle=360,  # Конечный угол дуги (360 = полный эллипс)
-        color=1.0,     # Значение для заполнения (белый = 1.0)
-        thickness=-1   # -1 = заполнить всю область эллипса   
-    )
-    
-    # 4. Применяем размытие для плавных краёв
-    blur_ksize = 15  # Нечётное число, чтобы ядро было симметричным
-    mask = cv2.GaussianBlur(mask, (blur_ksize, blur_ksize), 0)
-    
-    # 5. Ограничим значения в диапазоне [0, 1]
-    mask = np.clip(mask, 0, 1)
-    
-    return mask
-
-def paste_back(target_img, swapped_face, M, crop_size=256):
-    
-    # 1. Создание мягкой маски (Эрозия + Размытие)
-    mask = create_gradient_mask(crop_size)
-
-    # Преобразуем в трехканальную маску
-    mask_3c = np.stack([mask] * 3, axis=2)
-
-    # 2. Получаем размеры целевого изображения
-    h, w = target_img.shape[:2]
-
-    # 3. Нормализация swapped_face к float32 [0,1] для warp
-    swapped_face_norm = swapped_face.astype(np.float32) / 255.0
-    mask_norm = mask_3c.astype(np.float32)  # Маска уже [0,1]
-
-    # 4. Обратное преобразование (WARP_INVERSE_MAP) для лица И маски
-    # Используем BORDER_CONSTANT с borderValue=0.5 (серый, чтобы избежать синих/зеленых артефактов)
-    warped_face = cv2.warpAffine(
-        swapped_face_norm,
-        M,
-        (w, h),
-        flags=cv2.INTER_LANCZOS4 | cv2.WARP_INVERSE_MAP,
-        borderMode=cv2.BORDER_CONSTANT,
-        borderValue=0.5
-    )
-    
-    # Для маски (INTER_CUBIC — плавные границы)
-    warped_mask = cv2.warpAffine(
-        mask_norm,
-        M,
-        (w, h),
-        flags=cv2.INTER_CUBIC | cv2.WARP_INVERSE_MAP,
-        borderMode=cv2.BORDER_CONSTANT,
-        borderValue=0.0  # Маска: 0 за пределами
-    )
-    
-    # 5. Обработка после warp: Clip, NaN fix
-    warped_face = np.clip(warped_face, 0, 1)  # Убираем отрицательные
-    warped_face = np.nan_to_num(warped_face, nan=0.5)  # NaN -> серый
-    
-    warped_mask = np.clip(warped_mask, 0, 1)
-    warped_mask = np.nan_to_num(warped_mask, nan=0.0)
-    
-    # 6. Дополнительное размытие для устранения артефактов
-    warped_mask = cv2.GaussianBlur(warped_mask, (3, 3), 0)
-
-    # 7. Плавное наложение в float32
-    target_float = target_img.astype(np.float32) / 255.0
-    result_float = target_float * (1.0 - warped_mask) + warped_face * warped_mask
-    
-    # 8. Обратная нормализация к uint8
-    result = (result_float * 255).clip(0, 255).astype(np.uint8)
-
-    return result
-
-def visualize_points(img, points, color=(0, 255, 0)):
-    img = img.copy()
-    for p in points:
-        cv2.circle(img, tuple(p.astype(int)), 3, color, -1)
-
-# Итоговая функция run_hyperswap с аффинным преобразованием
-def run_hyperswap(session, source_face, target_face, target_img):
-    # 1. Подготовка эмбеддинга
-    source_embedding = source_face.normed_embedding.reshape(1, -1).astype(np.float32)
-
-    # 2. Получаем 5 точек target
-    target_landmarks_5 = get_landmarks_5(target_face)
-    visualize_points(target_img, target_landmarks_5, (0, 255, 0))  # Зеленые точки
-    
-    if target_landmarks_5 is None:
-        return None, None
-
-    # 3. Определение эталонных точек для выравнивания 256x256 (FFHQ Alignment)
-    std_landmarks_256 = np.array([
-        [ 84.87, 105.94],  # Левый глаз
-        [171.13, 105.94],  # Правый глаз
-        [128.00, 146.66],  # Кончик носа
-        [ 96.95, 188.64],  # Левый уголок рта
-        [159.05, 188.64]   # Правый уголок рта
-    ], dtype=np.float32)
-
-    # Вычисляем аффинную матрицу
-    M = get_affine_transform(target_landmarks_5.astype(np.float32), std_landmarks_256)
-    
-    # Применяем аффинное преобразование с новой матрицей M
-    crop = cv2.warpAffine(target_img, M, (256, 256), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REFLECT)
-
-    # 4. Преобразуем crop для модели
-    crop_input = crop[:, :, ::-1].astype(np.float32) / 255.0  # RGB -> [0,1]
-    crop_input = (crop_input - 0.5) / 0.5  # Нормализация
-    crop_input = crop_input.transpose(2, 0, 1)[np.newaxis, ...].astype(np.float32)
-
-    # 5. Инференс
-    try:
-        output = session.run(None, {'source': source_embedding, 'target': crop_input})[0][0]
-    except:
-        return target_img
-
-    if isinstance(output, np.ndarray):
-        # устранение NaN и бесконечностей
-        output = np.nan_to_num(output, nan=0.0, posinf=255.0, neginf=0.0)
-
-        # если диапазон похож на [-1,1] → нормализуем в [0,255]
-        if output.min() < 0.0 or output.max() <= 1.5:
-            output = ((output + 1.0) / 2.0 * 255.0)
-        # жёсткое ограничение диапазона и тип для OpenCV
-        output = np.clip(output, 0, 255).astype(np.uint8).copy()
-
-        # защита от повторного использования буфера (inplace CPU bug)
-        try:
-            output.setflags(write=True)
-        except Exception:
-            pass
-    # 6. Обратная нормализация
-
-    output = output.transpose(1, 2, 0)  # CHW -> HWC
-    output = output[:, :, ::-1]  # BGR -> RGB
-    
-    return output, M # Возвращаем лицо (256x256) и матрицу M
-
 
 def sort_by_order(face, order: str):
     if order == "left-right":
@@ -393,7 +218,6 @@ def get_face_single(img_data: np.ndarray, face, face_index=0, det_size=(640, 640
     try:
         faces_sorted = sort_by_order(face, order)
         return faces_sorted[face_index], 0, face_index
-        # return sorted(face, key=lambda x: x.bbox[0])[face_index], 0
     except IndexError:
         return None, 0, None
 
@@ -494,13 +318,13 @@ def swap_face(
                 logger.status("Using Hashed Target Face(s) Model...")
                 target_faces = TARGET_FACES
 
-            # No use in trying to swap faces if no faces are found, enhancement
+            # No use in trying to swap faces if no faces are found
             if len(target_faces) == 0:
                 logger.status("Cannot detect any Target, skipping swapping...")
                 return result_image, bbox, swapped_indexes
 
             if source_img is not None:
-                # separated management of wrong_gender between source and target, enhancement
+                # separated management of wrong_gender between source and target
                 source_face, src_wrong_gender, source_face_index = get_face_single(source_img, source_faces, face_index=source_faces_index[0], gender_source=gender_source, order=faces_order[1])
             else:
                 # source_face = sorted(source_faces, key=lambda x: x.bbox[0])[source_faces_index[0]]
@@ -523,7 +347,7 @@ def swap_face(
                 source_face_idx = 0
 
                 for face_num in faces_index:
-                    # No use in trying to swap faces if no further faces are found, enhancement
+                    # No use in trying to swap faces if no further faces are found
                     if face_num >= len(target_faces):
                         logger.status("Checked all existing target faces, skipping swapping...")
                         break
@@ -536,11 +360,7 @@ def swap_face(
                         target_face, wrong_gender, target_face_index = get_face_single(target_img, target_faces, face_index=face_num, gender_target=gender_target, order=faces_order[0])
                         if target_face is not None and wrong_gender == 0:
                             logger.status(f"Swapping...")
-                            if "hyperswap" in model:
-                                swapped_face_256, M = run_hyperswap(face_swapper, source_face, target_face, result)
-                                if swapped_face_256 is not None:
-                                    result = paste_back(result, swapped_face_256, M, crop_size=256)
-                            elif face_boost_enabled:
+                            if face_boost_enabled and "hyperswap" not in model:
                                 logger.status(f"Face Boost is enabled (inswapper/reswapper only)")
                                 bgr_fake, M = face_swapper.get(result, target_face, source_face, paste_back=False)
                                 bgr_fake, scale = restorer.get_restored_face(bgr_fake, face_restore_model, face_restore_visibility, codeformer_weight, interpolation)
@@ -692,7 +512,6 @@ def swap_face_many(
                 
 
                 # logger.status(f"Analyzing Target Image {i}...")
-                # target_face = analyze_faces(target_img)
                 if target_face is not None:
                     target_faces.append(target_face)
                 
@@ -700,13 +519,13 @@ def swap_face_many(
 
             progress_bar_reset(pbar)
             
-            # No use in trying to swap faces if no faces are found, enhancement
+            # No use in trying to swap faces if no faces are found
             if len(target_faces) == 0:
                 logger.status("Cannot detect any Target, skipping swapping...")
                 return result_images, bbox, swapped_indexes
 
             if source_img is not None:
-                # separated management of wrong_gender between source and target, enhancement
+                # separated management of wrong_gender between source and target
                 source_face, src_wrong_gender, source_face_index = get_face_single(source_img, source_faces, face_index=source_faces_index[0], gender_source=gender_source, order=faces_order[1])
             else:
                 # source_face = sorted(source_faces, key=lambda x: x.bbox[0])[source_faces_index[0]]
@@ -732,7 +551,7 @@ def swap_face_many(
 
                 logger.status(f"Swapping...")
                 for face_num in faces_index:
-                    # No use in trying to swap faces if no further faces are found, enhancement
+                    # No use in trying to swap faces if no further faces are found
                     if face_num >= len(target_faces):
                         logger.status("Checked all existing target faces, skipping swapping...")
                         break
@@ -743,16 +562,11 @@ def swap_face_many(
 
                     if source_face is not None and src_wrong_gender == 0:
                         # Reading results to make current face swap on a previous face result
-                        # logger.status(f"Swapping...")
                         for i, (target_img, target_face) in enumerate(zip(results, target_faces)):
                             target_face_single, wrong_gender, target_face_index = get_face_single(target_img, target_face, face_index=face_num, gender_target=gender_target, order=faces_order[0])
                             if target_face_single is not None and wrong_gender == 0:
                                 result = target_img
-                                if "hyperswap" in model:
-                                    swapped_face_256, M = run_hyperswap(face_swapper, source_face, target_face_single, result)
-                                    if swapped_face_256 is not None:
-                                        result = paste_back(result, swapped_face_256, M, crop_size=256)
-                                elif face_boost_enabled:
+                                if face_boost_enabled and "hyperswap" not in model:
                                     logger.status(f"Face Boost is enabled (inswapper/reswapper only)")
                                     bgr_fake, M = face_swapper.get(target_img, target_face_single, source_face, paste_back=False)
                                     bgr_fake, scale = restorer.get_restored_face(bgr_fake, face_restore_model, face_restore_visibility, codeformer_weight, interpolation)

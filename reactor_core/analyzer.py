@@ -2,7 +2,7 @@ import os
 import zipfile
 from reactor_utils import download  # Твоя функция скачивания из utils
 from .face_objects import Face
-from .face_models import SCRFD, ArcFaceONNX, Attribute, Landmark
+from .inswap import SCRFD, ArcFaceONNX, Attribute, Landmark
 from scripts.reactor_logger import logger
 
 class ReActorFaceAnalysis:
