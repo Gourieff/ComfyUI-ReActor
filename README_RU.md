@@ -2,10 +2,10 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_RU.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/версия_нода-0.6.2-brightgreen?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/версия_нода-0.7.0_alpha1-lightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
-    <img src="https://lovemet.ru/img/boosty.png" width="128" alt="Поддержать проект на Boosty"/>
+    <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Поддержать проект на Boosty"/>
     <br>
     <sup>
       Поддержать проект
@@ -46,6 +46,16 @@
 
 ## Что нового в последнем обновлении
 
+### 0.7.0 <sub><sup>ALPHA1</sup></sub>
+
+- 💥 **Важное обновление! ☢ Новое ядро РеАктора!**<br>✅ Библиотека `Insightface` больше не требуется!<br>✅ `C++ Build Tools` больше не требуются!<br>✅ Более простой процесс установки!<br>✅ Поддержка `Numpy 2.x` и `1.x`!<br>⚠ <u>Результат Свапа теперь слегка отличается</u>. Сложно сказать, хуже или лучше — результат просто чуть-чуть другой. По показателям схожести (оценка косинусного сходства векторов эмбеддингов лиц) результат стал немного лучше (хоть и незначительно), чем с Insightface.<br>Подробнее здесь: https://t.me/reactor_faceswap/55
+- Новый узел "Face Similarity" для проверки схожести лиц после свапа
+- Исправление "HyperSwap CPU Float normalization" (спасибо @Buumcode, Issue [#183](https://github.com/Gourieff/ComfyUI-ReActor/issues/183))
+- Прочие улучшение и исправления
+
+<details>
+	<summary><a>Предыдущие версии</a></summary>
+
 ### 0.6.2
 
 - Добавлена поддержка моделей HyperSwap от команды FaceFusion Labs (спасибо [@Buumcode](https://github.com/Buumcode) за вариант реализации)<br>Модели можно скачать [отсюда](https://huggingface.co/facefusion/models-3.3.0/tree/main)<br>(hyperswap_1a_256.onnx, hyperswap_1b_256.onnx, hyperswap_1c_256.onnx)<br>и положить в папку `ComfyUI/models/hyperswap`
@@ -75,9 +85,6 @@
 </center>
 
 - Исправления и улучшения
-
-<details>
-	<summary><a>Предыдущие версии</a></summary>
 
 ### 0.6.1
 
@@ -243,22 +250,14 @@ Basic workflow [💾](https://github.com/Gourieff/Assets/blob/main/comfyui-react
 
 ## Установка
 
-<details>
-	<summary>Портативная версия <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> для Windows</summary>
+### Портативная версия <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> для Windows
 
-1. Сделайте следующее:
-   - Установите [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) (Например, версию Community - этот шаг нужен для правильной компиляции библиотеки Insightface)
-   - ИЛИ только [VS C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), выберите "Desktop Development with C++" в разделе "Workloads -> Desktop & Mobile"
-   - ИЛИ если же вы не хотите устанавливать что-либо из вышеуказанного - выполните [данные шаги (раздел. I)](#insightfacebuild)
-2. Выберите из двух вариантов:
+1. Выберите из двух вариантов:
    - (ComfyUI Manager) Откройте ComfyUI Manager, нажвите "Install Custom Nodes", введите "ReActor" в поле "Search" и далее нажмите "Install". После того, как ComfyUI завершит установку, перезагрузите сервер.
    - (Вручную) Перейдите в `ComfyUI\custom_nodes`, откройте Консоль и выполните `git clone https://github.com/Gourieff/ComfyUI-ReActor`
-3. Перейдите `ComfyUI\custom_nodes\ComfyUI-ReActor` и запустите `install.bat`, дождитесь окончания установки
-4. Если модель "face_yolov8m.pt" у вас отсутствует - можете скачать её [отсюда](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/detection/bbox/face_yolov8m.pt) и положить в папку "ComfyUI\models\ultralytics\bbox"<br>
-То же самое и с "Sams" моделями, скачайте одну или обе [отсюда](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/sams) - и положите в папку "ComfyUI\models\sams"
-5. Запустите ComfyUI и найдите ReActor Node внутри меню `ReActor` или через поиск
-
-</details>
+2. Перейдите `ComfyUI\custom_nodes\ComfyUI-ReActor` и запустите `install.bat`, дождитесь окончания установки
+3. Скачайте необходимые модели из Раздела "Модели" ниже
+4. Запустите ComfyUI и найдите ReActor Node внутри меню `ReActor` или через поиск
 
 ## Модели
 
@@ -291,13 +290,15 @@ Basic workflow [💾](https://github.com/Gourieff/Assets/blob/main/comfyui-react
   - ReActorMakeFaceModelBatch (Создать пачку моделей лиц)
 - ••• Дополнительные •••
   - ReActorRestoreFace (Восстановление лиц)
+  - ReActorRestoreFaceAdvanced (Восстановление лиц продвинутое)
+  - ReActorFaceSimilarity (Оценка схожести лиц)
   - ReActorImageDublicator (Сделать из одного изображения несколько дубликатов)
   - ImageRGBA2RGB (Конвертировать RGBA в RGB)
   - ReActorUnload (Выгрузить модели РеАктора из VRAM)
 
 Соедините все необходимые слоты (slots) и запустите очередь (query).
 
-### Входы основного Нода
+### Входы основного Узла
 
 - `input_image` - это изображение, на котором надо поменять лицо или лица (целевое изображение, аналог "target image" в версии для SD WebUI);
   - Поддерживаемые ноды: "Load Image", "Load Video" или любые другие ноды предоставляющие изображение в качестве выхода;
@@ -310,7 +311,7 @@ Basic workflow [💾](https://github.com/Gourieff/Assets/blob/main/comfyui-react
 - `face_boost` - для соединения с ReActorFaceBoost;
   - Поддерживаемые ноды: "ReActorFaceBoost";
 
-### Выходы основного Нода
+### Выходы основного Узла
 
 - `IMAGE` - выход с готовым изображением (результатом);
   - Поддерживаемые ноды: любые ноды с изображением на входе;
@@ -372,53 +373,19 @@ ReActor заменит только то лицо, которое удовлет
 
 <a name="insightfacebuild">
 
-### **I. (Для пользователей Windows) Если вы до сих пор не можете установить пакет Insightface по каким-то причинам или же просто не желаете устанавливать Visual Studio или VS C++ Build Tools - сделайте следующее:**
-
-1. (ComfyUI Portable) Находясь в корневой директории, проверьте версию Python:<br>запустите CMD и выполните `python_embeded\python.exe -V`<br>Вы должны увидеть версию или 3.10, или 3.11, или 3.12, или 3.13
-2. Скачайте готовый пакет Insightface в соответствии с версией Python из предыдущего шага: [для Python 3.10](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp310-cp310-win_amd64.whl), [для Python 3.11](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp311-cp311-win_amd64.whl), [для Python 3.12](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp312-cp312-win_amd64.whl), [для Python 3.13](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp313-cp313-win_amd64.whl) - и сохраните в корневую директорию ComfyUI, если вы используете ComfyUI Portable
-3. Обновите PIP:<br>
-   `python_embeded\python.exe -m pip install -U pip`
-4. Затем установите Insightface:
-  <br>(для 3.10) `python_embeded\python.exe -m pip install insightface-0.7.3-cp310-cp310-win_amd64.whl`
-  <br>(для 3.11) `python_embeded\python.exe -m pip install insightface-0.7.3-cp311-cp311-win_amd64.whl`
-  <br>(для 3.12) `python_embeded\python.exe -m pip install insightface-0.7.3-cp312-cp312-win_amd64.whl`
-  <br>(для 3.13) `python_embeded\python.exe -m pip install insightface-0.7.3-cp313-cp313-win_amd64.whl`
-5. Готово!
-
-### **II. "AttributeError: 'NoneType' object has no attribute 'get'"**
+### **I. "AttributeError: 'NoneType' object has no attribute 'get'"**
 
 Эта ошибка появляется, если что-то не так с файлом модели `inswapper_128.onnx`
 
 Скачайте вручную по ссылке [отсюда](https://huggingface.co/datasets/Gourieff/ReActor/resolve/main/models/inswapper_128.onnx)
 и сохраните в директорию `ComfyUI\models\insightface`, заменив имеющийся файл
 
-### **III. "reactor.execute() got an unexpected keyword argument 'reference_image'"**
+### **II. "reactor.execute() got an unexpected keyword argument 'reference_image'"**
 
 Это означает, что поменялось обозначение входных точек (input points) всвязи с последним обновлением<br>
 Удалите из вашего рабочего пространства имеющийся ReActor Node и добавьте его снова
 
-### **IV. ControlNet Aux Node IMPORT failed - при использовании совместно с нодом ReActor**
-
-1. Закройте или остановите ComfyUI сервер, если он запущен
-2. Перейдите в корневую папку ComfyUI, откройте консоль CMD и выполните следующее:
-   - `python_embeded\python.exe -m pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless`
-   - `python_embeded\python.exe -m pip install opencv-python==4.7.0.72`
-3. Готово!
-
-<img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/reactor-w-controlnet.png?raw=true" alt="reactor+controlnet" />
-
-### **V. "ModuleNotFoundError: No module named 'basicsr'" или "subprocess-exited-with-error" при установке пакета future-0.18.3**
-
-- Скачайте https://github.com/Gourieff/Assets/raw/main/comfyui-reactor-node/future-0.18.3-py3-none-any.whl<br>
-- Скопируйте файл в корневую папку ComfyUI и выполните в консоли:
-
-      python_embeded\python.exe -m pip install future-0.18.3-py3-none-any.whl
-
-- Затем:
-
-      python_embeded\python.exe -m pip install basicsr
-
-### **VI. "fatal: fetch-pack: invalid index-pack output" при исполнении команды `git clone`"**
+### **III. "fatal: fetch-pack: invalid index-pack output" при исполнении команды `git clone`"**
 
 Попробуйте клонировать репозиторий с параметром `--depth=1` (только последний коммит):
 

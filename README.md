@@ -2,10 +2,10 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.6.2-brightgreen?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.7.0_alpha1-lightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
-    <img src="https://lovemet.ru/img/boosty.png" width="128" alt="Support Me on Boosty"/>
+    <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
     <br>
     <sup>
       Support This Project
@@ -46,6 +46,16 @@
 
 ## What's new in the latest update
 
+### 0.7.0 <sub><sup>ALPHA1</sup></sub>
+
+- 💥 **Big Update! ☢ New ReActor Core!**<br>✅ No `Insightface` required!<br>✅ No `C++ Build Tools` required!<br>✅ Instalation process is much easier now!<br>✅ `Numpy 2.x` friendly as well as `1.x`!<br>⚠ <u>A swap result is slightly different now</u>. Hard to say if it’s "better" or "worse" — it’s just a bit different. But if we look at the numbers (cosine similarity of face embeddings), the accuracy is actually a little higher than with Insightface.<br>More info you can find here: https://t.me/reactor_faceswap/55
+- New Node "Face Similarity" to check face likeness after you make a swap
+- HyperSwap CPU Float normalization fix (thanks @Buumcode, issue [#183](https://github.com/Gourieff/ComfyUI-ReActor/issues/183))
+- Other fixes and improvements
+
+<details>
+	<summary><a>Previous versions</a></summary>
+
 ### 0.6.2
 
 - Added support of HyperSwap models by FaceFusion Labs (thanks [@Buumcode](https://github.com/Buumcode) for contribution)<br>You can download them [here](https://huggingface.co/facefusion/models-3.3.0/tree/main)<br>(hyperswap_1a_256.onnx, hyperswap_1b_256.onnx, hyperswap_1c_256.onnx)<br>and put them into the `ComfyUI\models\hyperswap` directory
@@ -75,9 +85,6 @@
 </center>
 
 - Fixes and improvements
-
-<details>
-	<summary><a>Previous versions</a></summary>
 
 ### 0.6.1
 
@@ -242,21 +249,15 @@ Thanks to everyone who finds bugs, suggests new features and supports this proje
 
 ## Installation
 
-<details>
-	<summary>Standalone (Portable) <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> for Windows</summary>
+### Standalone (Portable) <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> for Windows
 
-1. Do the following:
-   - Install [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) (Community version - you need this step to build Insightface)
-   - OR only [VS C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) and select "Desktop Development with C++" under "Workloads -> Desktop & Mobile"
-   - OR if you don't want to install VS or VS C++ BT - follow [this steps (sec. I)](#insightfacebuild)
-2. Choose between two options:
+1. Choose between two options:
    - (ComfyUI Manager) Open ComfyUI Manager, click "Install Custom Nodes", type "ReActor" in the "Search" field and then click "Install". After ComfyUI will complete the process - please restart the Server.
    - (Manually) Go to `ComfyUI\custom_nodes`, open Console and run `git clone https://github.com/Gourieff/ComfyUI-ReActor`
-3. Go to `ComfyUI\custom_nodes\ComfyUI-ReActor` and run `install.bat`
-4. If you don't have the "face_yolov8m.pt" Ultralytics model - you can download it from the [Assets](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/detection/bbox/face_yolov8m.pt) and put it into the "ComfyUI\models\ultralytics\bbox" directory<br>As well as one or both of "Sams" models from [here](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/sams) - download (if you don't have them) and put into the "ComfyUI\models\sams" directory
-5. Run ComfyUI and find there ReActor Nodes inside the menu `ReActor` or by using a search
+2. Go to `ComfyUI\custom_nodes\ComfyUI-ReActor` and run `install.bat`
+3. Download required models from the Section below
+4. Run ComfyUI and find there ReActor Nodes inside the menu `ReActor` or by using a search
 
-</details>
 
 ## Models
 
@@ -287,6 +288,8 @@ List of Nodes:
   - ReActorMakeFaceModelBatch (Make Face Model Batch)
 - ••• Additional Nodes •••
   - ReActorRestoreFace (Face Restoration)
+  - ReActorRestoreFaceAdvanced (Restore Face Advanced)
+  - ReActorFaceSimilarity (Face Similarity)
   - ReActorImageDublicator (Dublicate one Image to Images List)
   - ImageRGBA2RGB (Convert RGBA to RGB)
   - ReActorUnload (Unload ReActor models from VRAM)
@@ -365,55 +368,19 @@ You can set the strength of face swap for `source_image` or `face_model` from 0%
 
 ## Troubleshooting
 
-<a name="insightfacebuild">
-
-### **I. (For Windows users) If you still cannot build Insightface for some reasons or just don't want to install Visual Studio or VS C++ Build Tools - do the following:**
-
-1. (ComfyUI Portable) From the root folder check the version of Python:<br>run CMD and type `python_embeded\python.exe -V`
-2. Download prebuilt Insightface package according to Python's version you see in the previous step: [for Python 3.10](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp310-cp310-win_amd64.whl), [for Python 3.11](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp311-cp311-win_amd64.whl), [for Python 3.12](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp312-cp312-win_amd64.whl), [for Python 3.13](https://github.com/Gourieff/Assets/raw/main/Insightface/insightface-0.7.3-cp313-cp313-win_amd64.whl) - and put into ComfyUI root folder if you use ComfyUI Portable
-3. Update your PIP:<br>
-   `python_embeded\python.exe -m pip install -U pip`
-4. Then install Insightface:
-  <br>(for 3.10) `python_embeded\python.exe -m pip install insightface-0.7.3-cp310-cp310-win_amd64.whl`
-  <br>(for 3.11) `python_embeded\python.exe -m pip install insightface-0.7.3-cp311-cp311-win_amd64.whl`
-  <br>(for 3.12) `python_embeded\python.exe -m pip install insightface-0.7.3-cp312-cp312-win_amd64.whl`
-  <br>(for 3.13) `python_embeded\python.exe -m pip install insightface-0.7.3-cp313-cp313-win_amd64.whl` 
-5. Enjoy!
-
-### **II. "AttributeError: 'NoneType' object has no attribute 'get'"**
+### **I. "AttributeError: 'NoneType' object has no attribute 'get'"**
 
 This error may occur if there's smth wrong with the model file `inswapper_128.onnx`
 
 Try to download it manually from [here](https://huggingface.co/datasets/Gourieff/ReActor/resolve/main/models/inswapper_128.onnx)
 and put it to the `ComfyUI\models\insightface` replacing existing one
 
-### **III. "reactor.execute() got an unexpected keyword argument 'reference_image'"**
+### **II. "reactor.execute() got an unexpected keyword argument 'reference_image'"**
 
 This means that input points have been changed with the latest update<br>
 Remove the current ReActor Node from your workflow and add it again
 
-### **IV. ControlNet Aux Node IMPORT failed error when using with ReActor Node**
-
-1. Close ComfyUI if it runs
-2. Go to the ComfyUI root folder, open CMD there and run:
-   - `python_embeded\python.exe -m pip uninstall -y opencv-python opencv-contrib-python opencv-python-headless`
-   - `python_embeded\python.exe -m pip install opencv-python==4.7.0.72`
-3. That's it!
-
-<img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/reactor-w-controlnet.png?raw=true" alt="reactor+controlnet" />
-
-### **V. "ModuleNotFoundError: No module named 'basicsr'" or "subprocess-exited-with-error" during future-0.18.3 installation**
-
-- Download https://github.com/Gourieff/Assets/raw/main/comfyui-reactor-node/future-0.18.3-py3-none-any.whl<br>
-- Put it to ComfyUI root And run:
-
-      python_embeded\python.exe -m pip install future-0.18.3-py3-none-any.whl
-
-- Then:
-
-      python_embeded\python.exe -m pip install basicsr
-
-### **VI. "fatal: fetch-pack: invalid index-pack output" when you try to `git clone` the repository"**
+### **III. "fatal: fetch-pack: invalid index-pack output" when you try to `git clone` the repository"**
 
 Try to clone with `--depth=1` (last commit only):
 
