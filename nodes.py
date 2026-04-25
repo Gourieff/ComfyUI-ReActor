@@ -7,6 +7,7 @@ import torchvision.transforms as T
 from torchvision.transforms.functional import normalize
 from torchvision.ops import masks_to_boxes
 
+import onnxruntime
 import numpy as np
 import cv2
 import math
@@ -14,12 +15,12 @@ from typing import List
 from PIL import Image
 import io
 from scipy import stats
-from insightface.app.common import Face
+from reactor_core.face_objects import Face
 from segment_anything import sam_model_registry
 
-from modules.processing import ProcessingImg2Img
-from modules.shared import state
-# from comfy_extras.chainner_models import model_loading
+from r_modules.processing import ProcessingImg2Img
+from r_modules.shared import state
+
 import comfy.model_management as model_management
 import comfy.utils
 import folder_paths
@@ -55,7 +56,7 @@ from reactor_utils import (
     progress_bar,
     progress_bar_reset
 )
-from reactor_patcher import apply_patch
+
 from r_facelib.utils.face_restoration_helper import FaceRestoreHelper
 from r_basicsr.utils.registry import ARCH_REGISTRY
 import scripts.r_archs.codeformer_arch
@@ -90,6 +91,17 @@ if "ultralytics" not in folder_paths.folder_names_and_paths:
     add_folder_path_and_extensions("ultralytics", [os.path.join(models_dir, "ultralytics")], folder_paths.supported_pt_extensions)
 if "sams" not in folder_paths.folder_names_and_paths:
     add_folder_path_and_extensions("sams", [os.path.join(models_dir, "sams")], folder_paths.supported_pt_extensions)
+
+def apply_log_level(console_log_level):
+    if console_log_level == 0:
+        logger.setLevel(logging.WARNING)
+        onnxruntime.set_default_logger_severity(3) # Убивает ворнинги ORT
+    elif console_log_level == 1:
+        logger.setLevel(logging.STATUS)
+        onnxruntime.set_default_logger_severity(3)
+    elif console_log_level == 2:
+        logger.setLevel(logging.INFO)
+        onnxruntime.set_default_logger_severity(0)
 
 def get_facemodels():
     models_path = os.path.join(FACE_MODELS_PATH, "*")
@@ -423,7 +435,7 @@ class reactor:
         if faces_order is None:
             faces_order = self.faces_order
 
-        apply_patch(console_log_level)
+        apply_log_level(console_log_level)
 
         if not enabled:
             return (input_image,face_model)
@@ -666,7 +678,7 @@ class ReActorWeight:
         
         images_list: List[Image.Image] = []
 
-        apply_patch(1)
+        apply_log_level(0)
 
         if len(images) > 0:
 
@@ -762,7 +774,7 @@ class BuildFaceModel:
             faces = []
             embeddings = []
 
-            apply_patch(1)
+            apply_log_level(0)
 
             if images is not None:
                 images_list: List[Image.Image] = batch_tensor_to_pil(images)
@@ -861,7 +873,7 @@ class SaveFaceModel:
         if save_mode and image is not None:
             source = tensor_to_pil(image)
             source = cv2.cvtColor(np.array(source), cv2.COLOR_RGB2BGR)
-            apply_patch(1)
+            apply_log_level(0)
             logger.status("Building Face Model...")
             face_model_raw = analyze_faces(source, det_size)
             if len(face_model_raw) == 0:
@@ -1640,6 +1652,7 @@ class ReActorFaceBoost:
         }
         return (face_boost, )
 
+
 class ReActorUnload:
     @classmethod
     def INPUT_TYPES(s):
@@ -1658,6 +1671,59 @@ class ReActorUnload:
         return (trigger,)
 
 
+class ReActorFaceSimilarity:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "image1": ("IMAGE",),
+                "image2": ("IMAGE",),
+            }
+        }
+
+    RETURN_TYPES = ("FLOAT", "STRING")
+    RETURN_NAMES = ("similarity_float", "similarity_text")
+    FUNCTION = "compare_faces"
+    CATEGORY = "🌌 ReActor"
+
+    def compare_faces(self, image1, image2):
+        
+        apply_log_level(0)
+
+        # 1. Конвертируем тензоры ComfyUI в формат OpenCV (BGR)
+        img1_cv = 255. * image1[0].cpu().numpy()
+        img1_cv = cv2.cvtColor(img1_cv.astype(np.uint8), cv2.COLOR_RGB2BGR)
+
+        img2_cv = 255. * image2[0].cpu().numpy()
+        img2_cv = cv2.cvtColor(img2_cv.astype(np.uint8), cv2.COLOR_RGB2BGR)
+
+        # 2. Ищем лица через
+        faces1 = analyze_faces(img1_cv, det_size=(640, 640))
+        faces2 = analyze_faces(img2_cv, det_size=(640, 640))
+
+        # 3. Защита от отсутствия лиц
+        if not faces1 or not faces2:
+            return (0.0, "Face not found in one or both images")
+
+        # Берем первые найденные лица
+        face1 = faces1[0]
+        face2 = faces2[0]
+
+        # 4. Вычисляем косинусное сходство (Cosine Similarity)
+        emb1 = face1.normed_embedding
+        emb2 = face2.normed_embedding
+        
+        # Скалярное произведение нормализованных векторов
+        similarity = np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
+
+        # 5. Форматируем результат
+        sim_float = float(similarity)
+        sim_float = max(0.0, min(1.0, sim_float)) 
+        sim_text = f"{sim_float * 100:.2f}%"
+
+        return (sim_float, sim_text)
+
+
 NODE_CLASS_MAPPINGS = {
     # --- MAIN NODES ---
     "ReActorFaceSwap": reactor,
@@ -1674,6 +1740,7 @@ NODE_CLASS_MAPPINGS = {
     # --- Additional Nodes ---
     "ReActorRestoreFace": RestoreFace,
     "ReActorRestoreFaceAdvanced": RestoreFaceAdvanced,
+    "ReActorFaceSimilarity": ReActorFaceSimilarity,
     "ReActorImageDublicator": ImageDublicator,
     "ImageRGBA2RGB": ImageRGBA2RGB,
     "ReActorUnload": ReActorUnload,
@@ -1695,6 +1762,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     # --- Additional Nodes ---
     "ReActorRestoreFace": "Restore Face 🌌 ReActor",
     "ReActorRestoreFaceAdvanced": "Restore Face Advanced 🌌 ReActor",
+    "ReActorFaceSimilarity": "Face Similarity 🌌 ReActor",
     "ReActorImageDublicator": "Image Dublicator (List) 🌌 ReActor",
     "ImageRGBA2RGB": "Convert RGBA to RGB 🌌 ReActor",
     "ReActorUnload": "Unload ReActor Models 🌌 ReActor",

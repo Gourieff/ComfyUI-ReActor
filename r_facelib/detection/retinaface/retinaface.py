@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision.models._utils import IntermediateLayerGetter as IntermediateLayerGetter
 
-from modules import shared
+from r_modules import shared
 
 from r_facelib.detection.align_trans import get_reference_facial_points, warp_and_crop_face
 from r_facelib.detection.retinaface.retinaface_net import FPN, SSH, MobileNetV1, make_bbox_head, make_class_head, make_landmark_head

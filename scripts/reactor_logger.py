@@ -2,7 +2,7 @@ import logging
 import copy
 import sys
 
-from modules import shared
+from r_modules import shared
 from reactor_utils import addLoggingLevel
 
 
