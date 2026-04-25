@@ -2,18 +2,10 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_RU.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/версия_нода-0.6.2_beta1-green?style=for-the-badge&labelColor=darkgreen)
-  
-  <!--<sup>
-  <font color=brightred>
-
-  ## !!! [Важные изменения](#latestupdate) !!!<br>Не забудьте добавить Нод заново в существующие воркфлоу
-  
-  </font>
-  </sup>-->
+  ![Version](https://img.shields.io/badge/версия_нода-0.6.2-brightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
-    <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Поддержать проект на Boosty"/>
+    <img src="https://lovemet.ru/img/boosty.png" width="128" alt="Поддержать проект на Boosty"/>
     <br>
     <sup>
       Поддержать проект
@@ -54,7 +46,7 @@
 
 ## Что нового в последнем обновлении
 
-### 0.6.2 <sub><sup>BETA1</sup></sub>
+### 0.6.2
 
 - Добавлена поддержка моделей HyperSwap от команды FaceFusion Labs (спасибо [@Buumcode](https://github.com/Buumcode) за вариант реализации)<br>Модели можно скачать [отсюда](https://huggingface.co/facefusion/models-3.3.0/tree/main)<br>(hyperswap_1a_256.onnx, hyperswap_1b_256.onnx, hyperswap_1c_256.onnx)<br>и положить в папку `ComfyUI/models/hyperswap`
 
@@ -64,21 +56,13 @@
 
 [Сравнение](https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2_swapmodels_compare.png) моделей Inswapper, Reswapper, HyperSwap
 
-- Исправления и улучшения
-
-### 0.6.2 <sub><sup>ALPHA2, ALPHA3, ALPHA4</sup></sub>
-
-- Небольшие, но важные исправления
-
-### 0.6.2 <sub><sup>ALPHA1</sup></sub>
-
-- [Экспериментально] Наконец-то! Теперь восстановление лиц затрагивает только заменённые лица
+- Теперь восстановление лиц затрагивает только заменённые лица
 
 <center>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2-whatsnew-01-ru.jpg?raw=true" alt="0.6.2-whatsnew-01" width="100%"/>
 </center>
 
-- [Экспериментально] Новый узел "Restore Face Advanced" с фильтром по лицам, спасибо https://github.com/Buumcode за реализацию "Фильтра восстановления лиц"<br>Этот узел помогает применить восстановление именно к нужному лицу или лицам
+- Новый узел "Restore Face Advanced" с фильтром по лицам, спасибо https://github.com/Buumcode за реализацию "Фильтра восстановления лиц"<br>Этот узел помогает применить восстановление именно к нужному лицу или лицам
 
 <center>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2-whatsnew-02.jpg?raw=true" alt="0.6.2-whatsnew-02" width="100%"/>
@@ -89,6 +73,11 @@
 <center>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2-whatsnew-03.jpg?raw=true" alt="0.6.2-whatsnew-03" width="50%"/>
 </center>
+
+- Исправления и улучшения
+
+<details>
+	<summary><a>Предыдущие версии</a></summary>
 
 ### 0.6.1
 
@@ -107,9 +96,6 @@
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.0-whatsnew-02.jpg?raw=true" alt="0.6.0-whatsnew-02" width="100%"/>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.0-alpha1-01.gif?raw=true" alt="0.6.0-whatsnew-03" width="540px"/>
 </center>
-
-<details>
-	<summary><a>Предыдущие версии</a></summary>
 
 ### 0.5.2
 

@@ -1,5 +1,5 @@
 app_title = "ReActor Node for ComfyUI"
-version_flag = "v0.6.2-b1"
+version_flag = "v0.6.2"
 
 COLORS = {
     "CYAN": "\033[0;36m",  # CYAN

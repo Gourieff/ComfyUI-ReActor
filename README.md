@@ -2,18 +2,10 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.6.2_beta1-green?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.6.2-brightgreen?style=for-the-badge&labelColor=darkgreen)
 
-  <!--<sup>
-  <font color=brightred>
-
-  ## !!! [Important Update](#latestupdate) !!!<br>Don't forget to add the Node again in existing workflows
-  
-  </font>
-  </sup>-->
-  
   <a href="https://boosty.to/artgourieff" target="_blank">
-    <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
+    <img src="https://lovemet.ru/img/boosty.png" width="128" alt="Support Me on Boosty"/>
     <br>
     <sup>
       Support This Project
@@ -54,7 +46,7 @@
 
 ## What's new in the latest update
 
-### 0.6.2 <sub><sup>BETA1</sup></sub>
+### 0.6.2
 
 - Added support of HyperSwap models by FaceFusion Labs (thanks [@Buumcode](https://github.com/Buumcode) for contribution)<br>You can download them [here](https://huggingface.co/facefusion/models-3.3.0/tree/main)<br>(hyperswap_1a_256.onnx, hyperswap_1b_256.onnx, hyperswap_1c_256.onnx)<br>and put them into the `ComfyUI\models\hyperswap` directory
 
@@ -64,21 +56,13 @@
 
 [Comparison grid](https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2_swapmodels_compare.png) of Inswapper vs Reswapper vs HyperSwap
 
-- Fixes and improvements
-
-### 0.6.2 <sub><sup>ALPHA2, ALPHA3, ALPHA4</sup></sub>
-
-- Small but important fixes
-
-### 0.6.2 <sub><sup>ALPHA1</sup></sub>
-
-- [Experimental] At last! Face restoration process affects only swapped faces
+- Face restoration process affects only swapped faces
 
 <center>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2-whatsnew-01.jpg?raw=true" alt="0.6.2-whatsnew-01" width="100%"/>
 </center>
 
-- [Experimental] New Node "Restore Face Advanced" with Face Restore Filter, thanks https://github.com/Buumcode for implementation of "Restore Face Filter"<br>This node helps you apply the restoration process to the face(s) you need
+- New Node "Restore Face Advanced" with Face Restore Filter, thanks https://github.com/Buumcode for implementation of "Restore Face Filter"<br>This node helps you apply the restoration process to the face(s) you need
 
 <center>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2-whatsnew-02.jpg?raw=true" alt="0.6.2-whatsnew-02" width="100%"/>
@@ -89,6 +73,11 @@
 <center>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.2-whatsnew-03.jpg?raw=true" alt="0.6.2-whatsnew-03" width="50%"/>
 </center>
+
+- Fixes and improvements
+
+<details>
+	<summary><a>Previous versions</a></summary>
 
 ### 0.6.1
 
@@ -107,9 +96,6 @@
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.0-whatsnew-02.jpg?raw=true" alt="0.6.0-whatsnew-02" width="100%"/>
 <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/0.6.0-alpha1-01.gif?raw=true" alt="0.6.0-whatsnew-03" width="540px"/>
 </center>
-
-<details>
-	<summary><a>Previous versions</a></summary>
 
 ### 0.5.2
 
