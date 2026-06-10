@@ -124,7 +124,10 @@ def patched_inswapper_init(self, model_file=None, session=None):
 
 def pathced_retinaface_prepare(self, ctx_id, **kwargs):
     if ctx_id<0:
-        self.session.set_providers(['CPUExecutionProvider'])
+        #utylee
+        # self.session.set_providers(['CPUExecutionProvider'])
+        self.session.set_providers(['ROCMExecutionProvider','CPUExecutionProvider'])
+
     nms_thresh = kwargs.get('nms_thresh', None)
     if nms_thresh is not None:
         self.nms_thresh = nms_thresh

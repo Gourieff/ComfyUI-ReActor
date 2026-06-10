@@ -33,16 +33,25 @@ np.warnings.filterwarnings('ignore')
 # PROVIDERS
 try:
     if torch.cuda.is_available():
+        logger.debug(f"CUDAExecutionProvider")
         providers = ["CUDAExecutionProvider"]
+        # providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
     elif torch.backends.mps.is_available():
+        logger.debug(f"CoreMLExecutionProvider")
+        # providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
         providers = ["CoreMLExecutionProvider"]
     elif hasattr(torch,'dml') or hasattr(torch,'privateuseone'):
+        logger.debug(f"ROCMExecutionProvider")
         providers = ["ROCMExecutionProvider"]
+        # providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
     else:
-        providers = ["CPUExecutionProvider"]
+        #utylee
+        # providers = ["CPUExecutionProvider"]
+        providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
 except Exception as e:
     logger.debug(f"ExecutionProviderError: {e}.\nEP is set to CPU.")
-    providers = ["CPUExecutionProvider"]
+    providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
+    # providers = ["CPUExecutionProvider"]
 
 models_path_old = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models")
 insightface_path_old = os.path.join(models_path_old, "insightface")

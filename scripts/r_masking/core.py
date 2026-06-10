@@ -598,7 +598,10 @@ def make_sam_mask_segmented(sam_model, segs, image, detection_hint, dilation,
         mask = combine_masks2(total_masks)
 
     finally:
+        #utylee
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # device = torch.device("rocm" if torch.cuda.is_available() else "cpu")
+        # device = torch.device("rocm" if torch.cuda.is_available() else "rocm")
         sam_model.to(device)
         # if sam_model.is_auto_mode:
         #     sam_model.cpu()

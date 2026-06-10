@@ -29,9 +29,13 @@ if cuda is not None:
     if cuda.is_available():
         providers = ["CUDAExecutionProvider"]
     else:
-        providers = ["CPUExecutionProvider"]
+        #utylee
+        # providers = ["CPUExecutionProvider"]
+        providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
 else:
-    providers = ["CPUExecutionProvider"]
+    #utylee
+    # providers = ["CPUExecutionProvider"]
+    providers = ["ROCMExecutionProvider", "CPUExecutionProvider"]
 
 
 def get_restored_face(cropped_face,

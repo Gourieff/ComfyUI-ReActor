@@ -35,21 +35,26 @@ SCORE = 0.969
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
 def nsfw_image(img_data, model_path: str):
-    if not MODEL_EXISTS:
-        logger.status("Ensuring NSFW detection model exists...")
-        if not ensure_nsfw_model(model_path):
-            return True
-    device = model_management.get_torch_device()
-    with Image.open(io.BytesIO(img_data)) as img:
-        if "cpu" in str(device):
-            predict = pipeline("image-classification", model=model_path)
-        else:
-            device_id = 0
-            if "cuda" in str(device):
-                device_id = int(str(device).split(":")[1])
-            predict = pipeline("image-classification", model=model_path, device=device_id)
-        result = predict(img)
-        if result[0]["label"] == "nsfw" and result[0]["score"] > SCORE:
-            logger.status(f'NSFW content detected with score={result[0]["score"]}, skipping...')
-            return True
-        return False
+    return False
+    #if not MODEL_EXISTS:
+    #    logger.status("Ensuring NSFW detection model exists...")
+    #    if not ensure_nsfw_model(model_path):
+    #        #utylee
+    #        # return True
+    #        return False
+    #device = model_management.get_torch_device()
+    #with Image.open(io.BytesIO(img_data)) as img:
+    #    if "cpu" in str(device):
+    #        predict = pipeline("image-classification", model=model_path)
+    #    else:
+    #        device_id = 0
+    #        if "cuda" in str(device):
+    #            device_id = int(str(device).split(":")[1])
+    #        predict = pipeline("image-classification", model=model_path, device=device_id)
+    #    result = predict(img)
+    #    if result[0]["label"] == "nsfw" and result[0]["score"] > SCORE:
+    #        logger.status(f'NSFW content detected with score={result[0]["score"]}, skipping...')
+    #        #utylee
+    #        # return True
+    #        return True
+    #    return False
