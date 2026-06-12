@@ -1039,7 +1039,7 @@ class RestoreFaceAdvanced:
                             # Вычисляем центр лица для более точного позиционирования
                             x1 = ((bbox[0] + bbox[2]) / 2) / img_width  # центр x
                             y1 = ((bbox[1] + bbox[3]) / 2) / img_height  # центр y
-                            area = face.shape[0] * face.shape[1]
+                            area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
                             confidence = bbox[4] if len(bbox) > 4 else 1.0
                         else:
                             # Если информация о bbox недоступна, используем приблизительные данные
@@ -1090,8 +1090,12 @@ class RestoreFaceAdvanced:
                         selected_indices = filtered_indices[take_start:take_start + take_count]
                     
                     elif face_selection == "largest":
-                        # При выборе "largest" просто берем take_count лиц с наибольшей площадью, начиная с take_start
-                        selected_indices = sorted_indices[take_start:take_start + take_count]
+                        largest_sorted = sorted(
+                            all_indices,
+                            key=lambda idx: face_info[idx]['area'],
+                            reverse=True
+                        )
+                        selected_indices = largest_sorted[take_start:take_start + take_count]
                     
                     elif face_selection == "index":
                         # В режиме "index" просто берем лица, начиная с take_start
