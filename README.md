@@ -268,7 +268,7 @@ Thanks to everyone who finds bugs, suggests new features and supports this proje
  - buffalo_l: downloaded on first launch into `ComfyUI\models\insightface\models\buffalo_l`, or you can download manually from [here](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models)
  - inswapper_128: downloaded during installation into `ComfyUI\models\insightface`, or you can download manually from [here](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models)
  - reswapper_128/256: https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models put them into `ComfyUI\models\reswapper`
- - hyperswap_256: https://huggingface.co/facefusion/models-3.3.0/tree/main (hyperswap_1a_256.onnx, hyperswap_1b_256.onnx, hyperswap_1a_256.onnx) put them into `ComfyUI\models\hyperswap`
+ - hyperswap_256: https://huggingface.co/facefusion/models-3.3.0/tree/main (hyperswap_1a_256.onnx, hyperswap_1b_256.onnx, hyperswap_1c_256.onnx) put them into `ComfyUI\models\hyperswap`
  - Face restoration models: https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/facerestore_models put any you like into `ComfyUI\models\facerestore_models`
  - Ultralytics model: https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/detection/bbox/face_yolov8m.pt put into `ComfyUI\models\ultralytics\bbox`
  - SAM models: https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/sams put into `ComfyUI\models\sams`
