@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.7.0-brightgreen?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.7.1_beta1-green?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
@@ -45,6 +45,10 @@
 <a name="latestupdate">
 
 ## What's new in the latest update
+
+### 0.7.1 <sub><sup>BETA1</sup></sub>
+
+- New `DLSS5 Frame Enhancer` node. NVIDIA's latest DLSS 5 technology for enhancing image quality (both overall frame or faces by mask). Installation [Instructions](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).
 
 ### 0.7.0
 
