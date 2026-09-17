@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_RU.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/версия_нода-0.7.0_beta1-green?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/версия_нода-0.7.0-brightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Поддержать проект на Boosty"/>
@@ -46,15 +46,13 @@
 
 ## Что нового в последнем обновлении
 
-### 0.7.0 <sub><sup>ALPHA2</sup></sub>
-
-- Исправлено: проблема определения пола и логика индексов лиц (Issue [#234](https://github.com/Gourieff/ComfyUI-ReActor/issues/234))
-
-### 0.7.0 <sub><sup>ALPHA1</sup></sub>
+### 0.7.0
 
 - 💥 **Важное обновление! ☢ Новое ядро РеАктора!**<br>✅ Библиотека `Insightface` больше не требуется!<br>✅ `C++ Build Tools` больше не требуются!<br>✅ Более простой процесс установки!<br>✅ Поддержка `Numpy 2.x` и `1.x`!<br>⚠ <u>Результат Свапа теперь слегка отличается</u>. Сложно сказать, хуже или лучше — результат просто чуть-чуть другой. По показателям схожести (оценка косинусного сходства векторов эмбеддингов лиц) результат стал немного лучше (хоть и незначительно), чем с Insightface.<br>Подробнее здесь: https://t.me/reactor_faceswap/55
 - Новый узел "Face Similarity" для проверки схожести лиц после свапа
 - Исправление "HyperSwap CPU Float normalization" (спасибо @Buumcode, Issue [#183](https://github.com/Gourieff/ComfyUI-ReActor/issues/183))
+- Исправлено: проблема определения пола и логика индексов лиц (Issue [#234](https://github.com/Gourieff/ComfyUI-ReActor/issues/234))
+- Улучшен `install.bat` для поддержки запуска установки в Comfy Desktop
 - Прочие улучшение и исправления
 
 <details>

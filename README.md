@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.7.0_beta1-green?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.7.0-brightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
@@ -46,15 +46,13 @@
 
 ## What's new in the latest update
 
-### 0.7.0 <sub><sup>ALPHA2</sup></sub>
-
-- Fixed: gender detection issue and face index logic (issue [#234](https://github.com/Gourieff/ComfyUI-ReActor/issues/234))
-
-### 0.7.0 <sub><sup>ALPHA1</sup></sub>
+### 0.7.0
 
 - 💥 **Big Update! ☢ New ReActor Core!**<br>✅ No `Insightface` required!<br>✅ No `C++ Build Tools` required!<br>✅ Instalation process is much easier now!<br>✅ `Numpy 2.x` friendly as well as `1.x`!<br>⚠ <u>A swap result is slightly different now</u>. Hard to say if it’s "better" or "worse" — it’s just a bit different. But if we look at the numbers (cosine similarity of face embeddings), the accuracy is actually a little higher than with Insightface.<br>More info you can find here: https://t.me/reactor_faceswap/55
 - New Node "Face Similarity" to check face likeness after you make a swap
 - HyperSwap CPU Float normalization fix (thanks @Buumcode, issue [#183](https://github.com/Gourieff/ComfyUI-ReActor/issues/183))
+- Fixed: gender detection issue and face index logic (issue [#234](https://github.com/Gourieff/ComfyUI-ReActor/issues/234))
+- Comfy Desktop friendly `install.bat`
 - Other fixes and improvements
 
 <details>
