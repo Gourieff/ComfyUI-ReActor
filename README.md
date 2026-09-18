@@ -48,7 +48,10 @@
 
 ### 0.7.1 <sub><sup>BETA1</sup></sub>
 
-- New `DLSS5 Frame Enhancer` node. NVIDIA's latest DLSS 5 technology for enhancing image quality (both overall frame or faces by mask). Installation [Instructions](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).
+- **New `DLSS5 Frame Enhancer` node**. NVIDIA's latest DLSS 5 technology for enhancing image quality (both overall frame or faces by mask). <br><u>See [Installation Instructions](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).</u><br><pre>The integration operates in an isolated Host mode, fully eliminating conflicts with ComfyUI's CUDA context.<br>Huge thanks to the author of the [Merserk/dlss5-visual-enhancer](https://github.com/Merserk/dlss5-visual-enhancer) project for the C++ wrapper (neuroframe_engine.dll and neuroframe_caller.dll), which formed the base of the computational bridge for this node.<br>Also thanks Gemini 3.1 Pro (via [Google Gemini](https://gemini.google.com/app)) for the contribution.</pre><u>Requirements:</u><br>
+-- NVIDIA display driver >= 616.x<br>
+-- NVIDIA RTX 40/50-series GPU<br>
+(compatibility with older RTX series is unconfirmed)
 
 ### 0.7.0
 
