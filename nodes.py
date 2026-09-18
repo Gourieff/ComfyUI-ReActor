@@ -1769,5 +1769,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ReActorImageDublicator": "Image Dublicator (List) 🌌 ReActor",
     "ImageRGBA2RGB": "Convert RGBA to RGB 🌌 ReActor",
     "ReActorUnload": "Unload ReActor Models 🌌 ReActor",
-    "DLSS5FrameEnhancer": "DLSS5 Frame Enhancer 🌌 ReActor"
+    "DLSS5FrameEnhancer": "DLSS5 Frame Enhancer 🌌 ReActor",
 }
