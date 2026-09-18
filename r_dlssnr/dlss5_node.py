@@ -42,6 +42,14 @@ class DLSS5FrameEnhancer:
     RETURN_NAMES = ("enhanced_image",)
     FUNCTION = "enhance"
     CATEGORY = "🌌 ReActor"
+    DESCRIPTION = (
+        "Requirements:\n"
+        "- NVIDIA display driver >= 616.x\n"
+        "- NVIDIA RTX 40/50-series GPU\n"
+        "(compatibility with older RTX series is unconfirmed)\n"
+        "- DLLs: neuroframe_caller.dll, neuroframe_engine.dll, nvngx_dlssnr.dll\nin custom_nodes/ComfyUI-ReActor/r_dlssnr/dll\nor custom_nodes/comfyui-reactor-node/r_dlssnr/dll\n"
+        "(see README.md in dll folder for instructions)"
+    )
 
     def load_bridge(self):
         if self.manager is None:
