@@ -304,6 +304,7 @@ Basic workflow [💾](https://github.com/Gourieff/Assets/blob/main/comfyui-react
   - ReActorImageDublicator (Сделать из одного изображения несколько дубликатов)
   - ImageRGBA2RGB (Конвертировать RGBA в RGB)
   - ReActorUnload (Выгрузить модели РеАктора из VRAM)
+  - DLSS5FrameEnhancer (Улучшение детализации кадра с NVIDIA DLSS 5)
 
 Соедините все необходимые слоты (slots) и запустите очередь (query).
 

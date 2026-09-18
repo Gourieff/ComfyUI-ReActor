@@ -302,6 +302,7 @@ List of Nodes:
   - ReActorImageDublicator (Dublicate one Image to Images List)
   - ImageRGBA2RGB (Convert RGBA to RGB)
   - ReActorUnload (Unload ReActor models from VRAM)
+  - DLSS5FrameEnhancer (Enhance frame quality with NVIDIA DLSS 5)
 
 Connect all required slots and run the query.
 
