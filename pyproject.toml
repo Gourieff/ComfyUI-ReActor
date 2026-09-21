@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-reactor"
 description = "(SFW-Friendly) The Fast and Simple Face Swap Extension for ComfyUI"
-version = "0.7.1-b2"
+version = "0.7.1-b3"
 license = { file = "LICENSE" }
 dependencies = ["onnx>=1.14.0", "opencv-python>=4.7.0.72", "numpy", "segment_anything", "albumentations>=1.4.16", "ultralytics"]
 
