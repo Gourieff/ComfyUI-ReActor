@@ -174,7 +174,7 @@ class reactor:
     RETURN_TYPES = ("IMAGE","FACE_MODEL","IMAGE")
     RETURN_NAMES = ("SWAPPED_IMAGE","FACE_MODEL","ORIGINAL_IMAGE")
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def __init__(self):
         # self.face_helper = None
@@ -547,7 +547,7 @@ class ReActorPlusOpt:
     RETURN_TYPES = ("IMAGE","FACE_MODEL","IMAGE")
     RETURN_NAMES = ("SWAPPED_IMAGE","FACE_MODEL","ORIGINAL_IMAGE")
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def __init__(self):
         # self.face_helper = None
@@ -602,7 +602,7 @@ class LoadFaceModel:
     RETURN_TYPES = ("FACE_MODEL","STRING")
     RETURN_NAMES = ("FACE_MODEL","FACE_MODEL_NAME")
     FUNCTION = "load_model"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def load_model(self, face_model):
         self.face_model = face_model
@@ -636,7 +636,7 @@ class ReActorWeight:
 
     OUTPUT_NODE = True
 
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def set_weight(self, input_image, faceswap_weight, face_model=None, source_image=None):
 
@@ -740,7 +740,7 @@ class BuildFaceModel:
 
     OUTPUT_NODE = True
 
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def build_face_model(self, image: Image.Image, det_size=(640, 640)):
         logging.StreamHandler.terminator = "\n"
@@ -870,7 +870,7 @@ class SaveFaceModel:
 
     OUTPUT_NODE = True
 
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def save_model(self, save_mode, face_model_name, select_face_index, image=None, face_model=None, det_size=(640, 640)):
         if save_mode and image is not None:
@@ -911,7 +911,7 @@ class RestoreFace:
 
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/PostProcessing"
 
     def execute(self, image, model, visibility, codeformer_weight, facedetection):
         result = reactor.restore_face(
@@ -942,7 +942,7 @@ class RestoreFaceAdvanced:
 
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/PostProcessing"
 
     def execute(
             self, image, model, visibility, codeformer_weight, facedetection, face_selection, sort_by="area", reverse_order=False, take_start=0, take_count=1
@@ -1225,7 +1225,7 @@ class MaskHelper:
     RETURN_TYPES = ("IMAGE","MASK","IMAGE","IMAGE")
     RETURN_NAMES = ("IMAGE","MASK","MASK_PREVIEW","SWAPPED_FACE")
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Masking"
 
     def execute(self, image, swapped_image, bbox_model_name, bbox_threshold, bbox_dilation, bbox_crop_factor, bbox_drop_size, sam_model_name, sam_dilation, sam_threshold, bbox_expansion, mask_hint_threshold, mask_hint_use_negative, morphology_operation, morphology_distance, blur_radius, sigma_factor, mask_optional=None):
         device = model_management.get_torch_device()
@@ -1528,7 +1528,7 @@ class ImageDublicator:
     RETURN_NAMES = ("IMAGES",)
     OUTPUT_IS_LIST = (True,)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Utils"
 
     def execute(self, image, count):
         images = [image for i in range(count)]
@@ -1546,7 +1546,7 @@ class ImageRGBA2RGB:
 
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Utils"
 
     def execute(self, image):
         out = rgba2rgb_tensor(image)
@@ -1577,7 +1577,7 @@ class MakeFaceModelBatch:
     RETURN_NAMES = ("FACE_MODELS",)
     FUNCTION = "execute"
 
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def execute(self, **kwargs):
         if len(kwargs) > 0:
@@ -1610,7 +1610,7 @@ class ReActorOptions:
 
     RETURN_TYPES = ("OPTIONS",)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def execute(self,input_faces_order, input_faces_index, detect_gender_input, source_faces_order, source_faces_index, detect_gender_source, console_log_level, restore_swapped_only):
         options: dict = {
@@ -1642,7 +1642,7 @@ class ReActorFaceBoost:
 
     RETURN_TYPES = ("FACE_BOOST",)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Face Swap"
 
     def execute(self,enabled,boost_model,interpolation,visibility,codeformer_weight,restore_with_main_after):
         face_boost: dict = {
@@ -1667,7 +1667,7 @@ class ReActorUnload:
 
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "execute"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Utils"
 
     def execute(self, trigger):
         unload_all_models()
@@ -1687,7 +1687,7 @@ class ReActorFaceSimilarity:
     RETURN_TYPES = ("FLOAT", "STRING")
     RETURN_NAMES = ("similarity_float", "similarity_text")
     FUNCTION = "compare_faces"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/Utils"
 
     def compare_faces(self, image1, image2):
         
