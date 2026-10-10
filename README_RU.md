@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_RU.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/версия_нода-0.7.1-brightgreen?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/версия_нода-0.7.2_beta1-green?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Поддержать проект на Boosty"/>
@@ -45,6 +45,13 @@
 <a name="latestupdate">
 
 ## Что нового в последнем обновлении
+
+### 0.7.2 <sub><sup>BETA1</sup></sub>
+
+- **Новый узел  `Cinematic Enhancer`**. Забудьте о пластиковой коже и скучной картинке. Этот узел поможет вдохнуть душу в любое фотореалистичное изображение. Вы можете добавлять разные эффекты (простое и продвинутое зерно, виньетку, размытие, коррекцию цвета, HDR) и применить LUT.<br>
+<u>Требования:</u><br>
+-- Положите LUT-файлы в `models/luts`, небольшую коллекцию можете найти [тут](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
+-- `pip install colour-science` в Пайтон вашего Comfy -ИЛИ- просто запустите install.bat (пользователи Win) внутри папки РеАктора
 
 ### 0.7.1
 
