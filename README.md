@@ -48,17 +48,20 @@
 
 ### 0.7.2 <sub><sup>BETA1</sup></sub>
 
-- **New `Cinematic Enhancer` node**. Forget about plastic skin and boring pictures. This Node can help make any photorealistic image more soulful. You can add different effects (simple or advanced grain, vignette, blur, color correction, HDR) and apply LUT.<br>
-<u>Requirements:</u><br>
--- Put LUT-files in `models/luts`, you can find some collection [here](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
--- `pip install colour-science` in your Comfy Python -OR- just run install.bat (Win users) in the ReActor's folder
+- **New `Cinematic Enhancer` node**. Forget about plastic skin and boring pictures. This Node can help make any photorealistic image more soulful. You can add different effects (simple or advanced grain, vignette, blur, color correction, HDR) and apply LUT.<br><u>Requirements:</u>
+  - Put LUT-files in `models/luts`, you can find some collection [here](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
+  - `pip install colour-science` in your Comfy Python -OR- just run install.bat (Win users) in the ReActor's folder
+
+  *Inspired by such nodes as: Image Apply LUT ([essentials](https://github.com/cubiq/ComfyUI_essentials)), LayerFilter: Film V2 ([LayerStyle](https://github.com/chflame163/ComfyUI_LayerStyle)), Color Correction ([post-processing-nodes](https://github.com/EllangoK/ComfyUI-post-processing-nodes)), HDR Effects ([SuperBeasts](https://github.com/SuperBeastsAI/ComfyUI-SuperBeasts))*
+  
+- Nodes divided into subcategories.
 
 ### 0.7.1
 
-- **New `DLSS5 Frame Enhancer` node**. NVIDIA's latest DLSS 5 technology for enhancing image quality (both overall frame or faces by mask). <br><u>See [Installation Instructions](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).</u><br><pre>The integration operates in an isolated Host mode, fully eliminating conflicts with ComfyUI's CUDA context.<br>Huge thanks to the author of the [Merserk/dlss5-visual-enhancer](https://github.com/Merserk/dlss5-visual-enhancer) project for the C++ wrapper (neuroframe_engine.dll and neuroframe_caller.dll), which formed the base of the computational bridge for this node.<br>Also thanks Gemini 3.1 Pro (via [Google Gemini](https://gemini.google.com/app)) for the contribution.</pre><u>Requirements:</u><br>
--- Windows 10/11<br>
--- NVIDIA display driver >= 616.x<br>
--- NVIDIA RTX 40/50-series GPU<br>
+- **New `DLSS5 Frame Enhancer` node**. NVIDIA's latest DLSS 5 technology for enhancing image quality (both overall frame or faces by mask). <br><u>See [Installation Instructions](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).</u><br><pre>The integration operates in an isolated Host mode, fully eliminating conflicts with ComfyUI's CUDA context.<br>Huge thanks to the author of the [Merserk/dlss5-visual-enhancer](https://github.com/Merserk/dlss5-visual-enhancer) project for the C++ wrapper (neuroframe_engine.dll and neuroframe_caller.dll), which formed the base of the computational bridge for this node.<br>Also thanks Gemini 3.1 Pro (via [Google Gemini](https://gemini.google.com/app)) for the contribution.</pre><u>Requirements:</u>
+  - Windows 10/11
+  - NVIDIA display driver >= 616.x
+  - NVIDIA RTX 40/50-series GPU<br>
 (compatibility with older RTX series is unconfirmed)
 - Other fixes and improvements
 

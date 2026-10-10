@@ -48,17 +48,20 @@
 
 ### 0.7.2 <sub><sup>BETA1</sup></sub>
 
-- **Новый узел  `Cinematic Enhancer`**. Забудьте о пластиковой коже и скучной картинке. Этот узел поможет вдохнуть душу в любое фотореалистичное изображение. Вы можете добавлять разные эффекты (простое и продвинутое зерно, виньетку, размытие, коррекцию цвета, HDR) и применить LUT.<br>
-<u>Требования:</u><br>
--- Положите LUT-файлы в `models/luts`, небольшую коллекцию можете найти [тут](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
--- `pip install colour-science` в Пайтон вашего Comfy -ИЛИ- просто запустите install.bat (пользователи Win) внутри папки РеАктора
+- **Новый узел  `Cinematic Enhancer`**. Забудьте о пластиковой коже и скучной картинке. Этот узел поможет вдохнуть душу в любое фотореалистичное изображение. Вы можете добавлять разные эффекты (простое и продвинутое зерно, виньетку, размытие, коррекцию цвета, HDR) и применить LUT.<br><u>Требования:</u>
+  - Положите LUT-файлы в `models/luts`, небольшую коллекцию можете найти [тут](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
+  - `pip install colour-science` в Пайтон вашего Comfy -ИЛИ- просто запустите install.bat (пользователи Win) внутри папки РеАктора
+
+  *Вдохновлено такими узлами как: Image Apply LUT ([essentials](https://github.com/cubiq/ComfyUI_essentials)), LayerFilter: Film V2 ([LayerStyle](https://github.com/chflame163/ComfyUI_LayerStyle)), Color Correction ([post-processing-nodes](https://github.com/EllangoK/ComfyUI-post-processing-nodes)), HDR Effects ([SuperBeasts](https://github.com/SuperBeastsAI/ComfyUI-SuperBeasts))*
+
+- Разделение узлов на подкатегории.
 
 ### 0.7.1
 
-- **Новый узел `DLSS5 Frame Enhancer`**. Новейшая технология DLSS 5 от NVIDIA для улучшения качества изображения (кадра целиком или лиц по маске).<br><u>Следуйте [инструкции по установке](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).</u><br><pre>Интеграция работает в изолированном Host-режиме, что полностью исключает конфликты с CUDA-контекстом ComfyUI.<br>Огромная благодарность автору проекта [Merserk/dlss5-visual-enhancer](https://github.com/Merserk/dlss5-visual-enhancer) за C++ обертку (neuroframe_engine.dll и neuroframe_caller.dll), которая легла в основу вычислительного моста для данного узла.<br>Также благодарность Gemini 3.1 Pro (через [Google Gemini](https://gemini.google.com/app)) за ассистирование и помощь.</pre><u>Требования:</u><br>
--- Windows 10/11<br>
--- NVIDIA display driver >= 616.x<br>
--- NVIDIA RTX 40/50-series GPU<br>
+- **Новый узел `DLSS5 Frame Enhancer`**. Новейшая технология DLSS 5 от NVIDIA для улучшения качества изображения (кадра целиком или лиц по маске).<br><u>Следуйте [инструкции по установке](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).</u><br><pre>Интеграция работает в изолированном Host-режиме, что полностью исключает конфликты с CUDA-контекстом ComfyUI.<br>Огромная благодарность автору проекта [Merserk/dlss5-visual-enhancer](https://github.com/Merserk/dlss5-visual-enhancer) за C++ обертку (neuroframe_engine.dll и neuroframe_caller.dll), которая легла в основу вычислительного моста для данного узла.<br>Также благодарность Gemini 3.1 Pro (через [Google Gemini](https://gemini.google.com/app)) за ассистирование и помощь.</pre><u>Требования:</u>
+  - Windows 10/11
+  - NVIDIA display driver >= 616.x
+  - NVIDIA RTX 40/50-series GPU
 (совместимость с более старыми сериями RTX не подтверждена)
 - Прочие улучшение и исправления
 
