@@ -41,7 +41,7 @@ class DLSS5FrameEnhancer:
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("enhanced_image",)
     FUNCTION = "enhance"
-    CATEGORY = "🌌 ReActor"
+    CATEGORY = "🌌 ReActor/PostProcessing"
     DESCRIPTION = (
         "Requirements:\n"
         "- NVIDIA display driver >= 616.x\n"
