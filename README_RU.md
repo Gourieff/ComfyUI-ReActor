@@ -314,6 +314,7 @@ Basic workflow [💾](https://github.com/Gourieff/Assets/blob/main/comfyui-react
   - ImageRGBA2RGB (Конвертировать RGBA в RGB)
   - ReActorUnload (Выгрузить модели РеАктора из VRAM)
   - DLSS5FrameEnhancer (Улучшение детализации кадра с NVIDIA DLSS 5)
+  - ReActorCinematicEnhancer (Добавление кинематографических эффектов к изображению)
 
 Соедините все необходимые слоты (slots) и запустите очередь (query).
 

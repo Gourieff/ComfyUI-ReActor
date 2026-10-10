@@ -312,6 +312,7 @@ List of Nodes:
   - ImageRGBA2RGB (Convert RGBA to RGB)
   - ReActorUnload (Unload ReActor models from VRAM)
   - DLSS5FrameEnhancer (Enhance frame quality with NVIDIA DLSS 5)
+  - ReActorCinematicEnhancer (Add cinematic effects to any image)
 
 Connect all required slots and run the query.
 
