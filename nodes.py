@@ -67,6 +67,7 @@ import scripts.r_masking.segs as masking_segs
 import scripts.reactor_sfw as sfw
 
 from r_dlssnr.dlss5_node import DLSS5FrameEnhancer
+from r_nodes.cinematic_enhancer import ReActorCinematicEnhancer
 
 
 models_dir = folder_paths.models_dir
@@ -1747,6 +1748,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageRGBA2RGB": ImageRGBA2RGB,
     "ReActorUnload": ReActorUnload,
     "DLSS5FrameEnhancer": DLSS5FrameEnhancer,
+    "ReActorCinematicEnhancer": ReActorCinematicEnhancer,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -1770,4 +1772,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageRGBA2RGB": "Convert RGBA to RGB 🌌 ReActor",
     "ReActorUnload": "Unload ReActor Models 🌌 ReActor",
     "DLSS5FrameEnhancer": "DLSS5 Frame Enhancer 🌌 ReActor",
+    "ReActorCinematicEnhancer": "Cinematic Enhancer 🌌 ReActor",
 }

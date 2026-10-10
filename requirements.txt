@@ -4,3 +4,4 @@ opencv-python>=4.7.0.72
 numpy
 segment_anything
 ultralytics
+colour-science
