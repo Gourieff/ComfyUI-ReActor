@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.7.1_beta3-green?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.7.1-brightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
@@ -46,13 +46,14 @@
 
 ## What's new in the latest update
 
-### 0.7.1 <sub><sup>BETA1</sup></sub>
+### 0.7.1
 
 - **New `DLSS5 Frame Enhancer` node**. NVIDIA's latest DLSS 5 technology for enhancing image quality (both overall frame or faces by mask). <br><u>See [Installation Instructions](https://github.com/Gourieff/ComfyUI-ReActor/blob/main/r_dlssnr/dll/README.md).</u><br><pre>The integration operates in an isolated Host mode, fully eliminating conflicts with ComfyUI's CUDA context.<br>Huge thanks to the author of the [Merserk/dlss5-visual-enhancer](https://github.com/Merserk/dlss5-visual-enhancer) project for the C++ wrapper (neuroframe_engine.dll and neuroframe_caller.dll), which formed the base of the computational bridge for this node.<br>Also thanks Gemini 3.1 Pro (via [Google Gemini](https://gemini.google.com/app)) for the contribution.</pre><u>Requirements:</u><br>
 -- Windows 10/11<br>
 -- NVIDIA display driver >= 616.x<br>
 -- NVIDIA RTX 40/50-series GPU<br>
 (compatibility with older RTX series is unconfirmed)
+- Other fixes and improvements
 
 ### 0.7.0
 
