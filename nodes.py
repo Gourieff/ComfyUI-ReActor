@@ -425,6 +425,8 @@ class reactor:
         if isinstance(input_image, torch.Tensor) and input_image.device != device:
             input_image = input_image.to(device)
 
+        original_image = input_image
+        
         if face_boost is not None:
             self.face_boost_enabled = face_boost["enabled"]
             self.boost_model = face_boost["boost_model"]
@@ -441,10 +443,10 @@ class reactor:
         apply_log_level(console_log_level)
 
         if not enabled:
-            return (input_image,face_model)
+            return (input_image,face_model,original_image)
         elif source_image is None and face_model is None:
             logger.error("Please provide 'source_image' or `face_model`")
-            return (input_image,face_model)
+            return (input_image,face_model,original_image)
 
         if face_model == "none":
             face_model = None
@@ -503,7 +505,6 @@ class reactor:
             if len(p.bbox) > 0:
                 self.last_swapped_bboxes = p.bbox
                 # self.last_swapped_indices = p.swapped_indexes
-            original_image = input_image
 
             if face_model is None:
                 current_face_model = get_current_faces_model()
