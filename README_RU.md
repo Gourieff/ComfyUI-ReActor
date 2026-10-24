@@ -46,7 +46,7 @@
 
 ## Что нового в последнем обновлении
 
-### 0.7.2 <sub><sup>BETA1</sup></sub>
+### 0.7.2 <sub><sup>BETA1, BETA2</sup></sub>
 
 - **Новый узел  `Cinematic Enhancer`**. Забудьте о пластиковой коже и скучной картинке. Этот узел поможет вдохнуть душу в любое фотореалистичное изображение. Вы можете добавлять разные эффекты (простое и продвинутое зерно, виньетку, размытие, коррекцию цвета, HDR) и применить LUT.<br><u>Требования:</u>
   - Положите LUT-файлы в `models/luts`, небольшую коллекцию можете найти [тут](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
@@ -54,7 +54,8 @@
 
   *Вдохновлено такими узлами как: Image Apply LUT ([essentials](https://github.com/cubiq/ComfyUI_essentials)), LayerFilter: Film V2 ([LayerStyle](https://github.com/chflame163/ComfyUI_LayerStyle)), Color Correction ([post-processing-nodes](https://github.com/EllangoK/ComfyUI-post-processing-nodes)), HDR Effects ([SuperBeasts](https://github.com/SuperBeastsAI/ComfyUI-SuperBeasts))*
 
-- Разделение узлов на подкатегории.
+- Разделение узлов на подкатегории
+- Улучшения и исправления
 
 ### 0.7.1
 
@@ -63,7 +64,7 @@
   - NVIDIA display driver >= 616.x
   - NVIDIA RTX 40/50-series GPU
 (совместимость с более старыми сериями RTX не подтверждена)
-- Прочие улучшение и исправления
+- Прочие улучшения и исправления
 
 ### 0.7.0
 
@@ -72,7 +73,7 @@
 - Исправление "HyperSwap CPU Float normalization" (спасибо @Buumcode, Issue [#183](https://github.com/Gourieff/ComfyUI-ReActor/issues/183))
 - Исправлено: проблема определения пола и логика индексов лиц (Issue [#234](https://github.com/Gourieff/ComfyUI-ReActor/issues/234))
 - Улучшен `install.bat` для поддержки запуска установки в Comfy Desktop
-- Прочие улучшение и исправления
+- Прочие улучшения и исправления
 
 <details>
 	<summary><a>Предыдущие версии</a></summary>

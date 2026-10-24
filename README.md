@@ -46,7 +46,7 @@
 
 ## What's new in the latest update
 
-### 0.7.2 <sub><sup>BETA1</sup></sub>
+### 0.7.2 <sub><sup>BETA1, BETA2</sup></sub>
 
 - **New `Cinematic Enhancer` node**. Forget about plastic skin and boring pictures. This Node can help make any photorealistic image more soulful. You can add different effects (simple or advanced grain, vignette, blur, color correction, HDR) and apply LUT.<br><u>Requirements:</u>
   - Put LUT-files in `models/luts`, you can find some collection [here](https://huggingface.co/datasets/Gourieff/ReActor/tree/main/luts)<br>
@@ -54,7 +54,8 @@
 
   *Inspired by such nodes as: Image Apply LUT ([essentials](https://github.com/cubiq/ComfyUI_essentials)), LayerFilter: Film V2 ([LayerStyle](https://github.com/chflame163/ComfyUI_LayerStyle)), Color Correction ([post-processing-nodes](https://github.com/EllangoK/ComfyUI-post-processing-nodes)), HDR Effects ([SuperBeasts](https://github.com/SuperBeastsAI/ComfyUI-SuperBeasts))*
   
-- Nodes divided into subcategories.
+- Nodes divided into subcategories
+- Fixes and improvements
 
 ### 0.7.1
 
