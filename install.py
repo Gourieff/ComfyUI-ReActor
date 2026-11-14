@@ -3,10 +3,17 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import subprocess
 import os, sys
+
 try:
-    from pkg_resources import get_distribution as distributions
-except:
-    from importlib_metadata import distributions
+    from importlib.metadata import distribution as _get_dist, PackageNotFoundError
+except ImportError:
+    # Для старых версий Python, если используется бэкпорт или pkg_resources
+    try:
+        from importlib_metadata import distribution as _get_dist, PackageNotFoundError
+    except ImportError:
+        from pkg_resources import get_distribution as _get_dist
+        PackageNotFoundError = Exception  # Заглушка для совместимости
+
 from tqdm import tqdm
 import urllib.request
 from packaging import version as pv
@@ -28,12 +35,18 @@ model_path = os.path.join(models_dir_path, model_name)
 def run_pip(*args):
     subprocess.run([sys.executable, "-m", "pip", "install", "--no-warn-script-location", *args])
 
+def distribution(package_name: str):
+    try:
+        return _get_dist(package_name)
+    except (PackageNotFoundError, Exception):
+        return None
+
 def is_installed (
         package: str, version: str = None, strict: bool = True
 ):
     has_package = None
     try:
-        has_package = distributions(package)
+        has_package = distribution(package)
         if has_package is not None:
             if version is not None:
                 installed_version = has_package.version
