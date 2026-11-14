@@ -49,6 +49,7 @@
 ### 0.7.2 <sub><sup>BETA3</sup></sub>
 
 - **`DLSS5 Frame Enhancer` improved**: added support for processing huge images (over 4096px on the long side), added `tqdm` progress bar in the console
+- The installer script updated to better support of different Py's versions
 
 ### 0.7.2 <sub><sup>BETA1, BETA2</sup></sub>
 
