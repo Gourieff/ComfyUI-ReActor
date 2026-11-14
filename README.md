@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.7.2_beta2-green?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.7.2_beta3-green?style=for-the-badge&labelColor=darkgreen)
 
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
@@ -45,6 +45,11 @@
 <a name="latestupdate">
 
 ## What's new in the latest update
+
+### 0.7.2 <sub><sup>BETA3</sup></sub>
+
+- **`DLSS5 Frame Enhancer` improved**: added support for processing huge images (over 4096px on the long side), added `tqdm` progress bar in the console
+- The installer script updated to better support of different Py's versions
 
 ### 0.7.2 <sub><sup>BETA1, BETA2</sup></sub>
 

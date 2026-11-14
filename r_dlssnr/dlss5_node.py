@@ -1,12 +1,12 @@
 import torch
 import numpy as np
 import os
+from tqdm import tqdm
 import comfy.model_management as model_management
 from scripts.reactor_logger import logger
 from .dlss5_core import DLSSStandaloneManager
 from r_modules.shared import state
 from reactor_utils import (
-    batch_tensor_to_pil, 
     progress_bar,
     progress_bar_reset
 )
@@ -60,6 +60,104 @@ class DLSS5FrameEnhancer:
             self.manager.initialize(ordinal)
             logger.status(f"DLSS-5 Bridge initialized on GPU {ordinal}")
 
+    def _run_with_tiling(
+        self,
+        img_np: np.ndarray,
+        mask_np: np.ndarray | None,
+        settings: dict,
+        ui_pbar=None,
+        console_pbar=None,
+        frame_idx: int = 0,
+        batch_size: int = 1,
+        max_tile: int = 4096,
+        overlap: int = 64,
+    ) -> np.ndarray | None:
+        h, w, c = img_np.shape
+
+        # 1. Если картинка влезает целиком — обрабатываем за 1 проход
+        if h <= max_tile and w <= max_tile:
+            if console_pbar is not None:
+                console_pbar.set_description(f"[ReActor][DLSS-5] {'Batch ' if batch_size > 1 else ''}({w}x{h})")
+            dest_np = np.ascontiguousarray(np.zeros_like(img_np))
+            self.manager.process_host(
+                source=img_np,
+                destination=dest_np,
+                settings=settings,
+                reset=True,
+                mask=mask_np,
+            )
+            if ui_pbar is not None:
+                ui_pbar.update(1)
+            if console_pbar is not None:
+                console_pbar.update(1)
+            return dest_np
+
+        # 2. Если картинка огромная — режем на тайлы
+        out_acc = np.zeros((h, w, c), dtype=np.float32)
+        weight_acc = np.zeros((h, w, 1), dtype=np.float32)
+
+        stride = max_tile - overlap
+        y_steps = list(range(0, max(1, h - overlap), stride))
+        x_steps = list(range(0, max(1, w - overlap), stride))
+        num_tiles = len(y_steps) * len(x_steps)
+        tile_idx = 0
+
+        for y in y_steps:
+            for x in x_steps:
+                if state.interrupted or model_management.processing_interrupted():
+                    logger.status("Interrupted by User")
+                    return None
+
+                tile_idx += 1
+                if console_pbar is not None:
+                    if batch_size > 1:
+                        console_pbar.set_description(
+                            f"[ReActor][DLSS-5] Frame {frame_idx + 1}/{batch_size} (Tile {tile_idx}/{num_tiles})"
+                        )
+                    else:
+                        console_pbar.set_description(f"[ReActor][DLSS-5] Tiling ({w}x{h})")
+
+                y2 = min(y + max_tile, h)
+                x2 = min(x + max_tile, w)
+                y1 = max(0, y2 - max_tile)
+                x1 = max(0, x2 - max_tile)
+
+                tile_in = np.ascontiguousarray(img_np[y1:y2, x1:x2, :])
+                tile_out = np.ascontiguousarray(np.zeros_like(tile_in))
+                tile_mask = np.ascontiguousarray(mask_np[y1:y2, x1:x2]) if mask_np is not None else None
+
+                self.manager.process_host(
+                    source=tile_in,
+                    destination=tile_out,
+                    settings=settings,
+                    reset=True,
+                    mask=tile_mask,
+                )
+
+                th, tw = tile_out.shape[:2]
+                wy = np.ones(th, dtype=np.float32)
+                wx = np.ones(tw, dtype=np.float32)
+
+                if y1 > 0:
+                    wy[:overlap] = np.linspace(0, 1, overlap, dtype=np.float32)
+                if y2 < h:
+                    wy[-overlap:] = np.linspace(1, 0, overlap, dtype=np.float32)
+                if x1 > 0:
+                    wx[:overlap] = np.linspace(0, 1, overlap, dtype=np.float32)
+                if x2 < w:
+                    wx[-overlap:] = np.linspace(1, 0, overlap, dtype=np.float32)
+
+                weight = wy[:, None, None] * wx[None, :, None]
+                out_acc[y1:y2, x1:x2, :] += tile_out * weight
+                weight_acc[y1:y2, x1:x2, :] += weight
+
+                if ui_pbar is not None:
+                    ui_pbar.update(1)
+                if console_pbar is not None:
+                    console_pbar.update(1)
+
+        return out_acc / np.maximum(weight_acc, 1e-6)
+    
     def enhance(self, image, style, intensity, local_tone, local_structure, 
                 skin_structure, color_strength, tone_preservation, 
                 face_skin_protection, grain_preservation, nr_passes, auto_mask, mask=None):
@@ -76,38 +174,60 @@ class DLSS5FrameEnhancer:
             "shimmer_suppression": 0.0, "prefer_nvof": False
         }
 
+        max_tile, overlap = 4096, 64
+        stride = max_tile - overlap
+        batch_size = len(image)
+
+        total_ui_steps = sum(
+            1 if (img.shape[0] <= max_tile and img.shape[1] <= max_tile) else
+            len(range(0, max(1, img.shape[0] - overlap), stride)) * len(range(0, max(1, img.shape[1] - overlap), stride))
+            for img in image
+        )
+
+        ui_pbar = progress_bar(total_ui_steps)
+
+        is_tiled = total_ui_steps > batch_size
+        console_pbar = tqdm(
+            total=total_ui_steps,
+            desc="[ReActor][DLSS-5] Processing",
+            unit="tile" if is_tiled else "frame",
+            dynamic_ncols=True,
+            leave=True,
+        )
+
         enhanced_batch = []
-
-        pil_images = batch_tensor_to_pil(image)
-        pbar = progress_bar(len(pil_images))
         
-        for i in range(len(image)):
+        try:
+            for i in range(batch_size):
+                if state.interrupted or model_management.processing_interrupted():
+                    logger.status("Interrupted by User")
+                    break
 
-            if state.interrupted or model_management.processing_interrupted():
-                logger.status("Interrupted by User")
-                break
+                img_np = np.ascontiguousarray(image[i].cpu().numpy().astype(np.float32))
+                mask_np = None
+                if mask is not None:
+                    mask_np = np.ascontiguousarray(mask[i].cpu().numpy().astype(np.float32))
 
-            img_np = np.ascontiguousarray(image[i].cpu().numpy().astype(np.float32))
-            dest_np = np.ascontiguousarray(np.zeros_like(img_np))
-            
-            mask_np = None
-            if mask is not None:
-                mask_np = np.ascontiguousarray(mask[i].cpu().numpy().astype(np.float32))
-            
-            # Вызываем Host-обработчик (без CUDA конфликтов)
-            self.manager.process_host(
-                source=img_np,
-                destination=dest_np,
-                settings=settings,
-                reset=True,
-                mask=mask_np
-            )
-            
-            out_tensor = torch.from_numpy(dest_np).to(self.device) 
-            enhanced_batch.append(out_tensor)
+                dest_np = self._run_with_tiling(
+                    img_np=img_np,
+                    mask_np=mask_np,
+                    settings=settings,
+                    ui_pbar=ui_pbar,
+                    console_pbar=console_pbar,
+                    frame_idx=i,
+                    batch_size=batch_size,
+                    max_tile=max_tile,
+                    overlap=overlap,
+                )
 
-            pbar.update(1)
+                if dest_np is None:
+                    break
 
-        progress_bar_reset(pbar)
+                out_tensor = torch.from_numpy(dest_np).to(self.device)
+                enhanced_batch.append(out_tensor)
+        finally:
+            console_pbar.close()
+
+        progress_bar_reset(ui_pbar)
         
         return (torch.stack(enhanced_batch),)
